@@ -18,6 +18,16 @@
 
   --color-conf-low: #f08a6b;    --color-conf-med: #f0deb8;
   --color-conf-high: #6ee3a8;
+  /* Lighter versions for confidence labels, from the Buildings result card */
+  --color-conf-low-text: #f5a88f; --color-conf-med-text: #f3e4c6;
+  --color-conf-high-text: #9becc2;
+
+  --animate-fade-up: waha-fade 400ms ease-out both;
+  --animate-drawer: waha-slide 320ms cubic-bezier(.2, .8, .2, 1) both;
+  --animate-pulse-soft: waha-pulse 1.2s ease-in-out infinite;
+  @keyframes waha-fade { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  @keyframes waha-slide { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: none; } }
+  @keyframes waha-pulse { 0%, 100% { opacity: .45; } 50% { opacity: .9; } }
 
   --color-status-submitted: #a9b8ff;     --color-status-review: #e8c56b;
   --color-status-investigating: #c9a2ff; --color-status-verified: #6ee3a8;
@@ -59,4 +69,9 @@
   }
   h1, h2, h3, h4 { @apply font-display font-black; }
   a { @apply text-aqua-300 hover:text-mist-50; }
+}
+
+/* Motion is decoration. Respect people who turn it off. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; }
 }
