@@ -1,8 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import {
-  BUILDINGS, DEFAULT_ASSUMPTIONS, ReportInputSchema, SAMPLE_REPORTS, createReport, mergeReports, nearestBuilding,
-  type Report, type ReportInput, type Role,
+  BUILDINGS, DEFAULT_ASSUMPTIONS, ReportInputSchema, SAMPLE_REPORTS, changeStatus, createReport, mergeReports, nearestBuilding,
+  type Report, type ReportInput, type ReportStatus, type Role,
 } from '@waha/shared';
 import { server, type Source } from '../api';
 
@@ -12,6 +12,8 @@ type ReportState = {
   source: Source;
   load: () => Promise<void>;
   add: (input: ReportInput, reporter: Role) => Promise<Report>;
+  /** Authority only. Throws if the role or the move isn't allowed. */
+  setStatus: (id: string, to: ReportStatus, by: Role, note?: string) => Promise<Report>;
 };
 
 /**
@@ -39,6 +41,16 @@ export const useReports = create<ReportState>()(
         );
         set({ reports: mergeReports(get().reports, [report]), source: remote ? 'server' : 'browser' });
         return report;
+      },
+      setStatus: async (id, to, by, note) => {
+        const current = get().reports.find((r) => r.id === id);
+        if (!current) throw new Error('That report is gone');
+        // Run the same rules locally first, so the offline path can't skip them.
+        const local = changeStatus(current, to, by, note);
+        const remote = await server<Report>(`/reports/${id}/status`, { to, by, ...(note ? { note } : {}) }, 'PATCH');
+        const next = remote ?? local;
+        set({ reports: mergeReports(get().reports, [next]), source: remote ? 'server' : 'browser' });
+        return next;
       },
     }),
     { name: 'waha-reports', partialize: (s) => ({ reports: s.reports }) },

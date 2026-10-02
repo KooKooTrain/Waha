@@ -1,13 +1,16 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import { Bar, BarChart, ResponsiveContainer, Tooltip as ChartTip, XAxis } from 'recharts';
-import { BUILDING_TYPE_LABELS, REPORT_STATUSES, STATUS_LABELS, cityTotals, reportStats } from '@waha/shared';
+import { BUILDING_TYPE_LABELS, REPORT_STATUSES, STATUS_LABELS, cityTotals, isOpen, reportStats } from '@waha/shared';
 import { api, useApi } from '../api';
 import { useAssumptionStore, useAssumptions } from '../store/assumptions';
 import { useReports } from '../store/reports';
+import { useRole } from '../store/role';
+import { StatusActions } from '../ui/StatusActions';
+import { placeOf } from './Community';
 import { AssumptionsDrawer } from '../ui/AssumptionsDrawer';
 import { PageHeader, SourceNote } from '../ui/Layout';
-import { ConfidenceMeter, EstimateBadge, STATUS_HEX, fmt } from '../ui/kit';
+import { ConfidenceMeter, EstimateBadge, STATUS_HEX, StatusChip, fmt, fmtDate } from '../ui/kit';
 
 const card = 'rounded-xl border border-white/12 bg-[rgb(5_44_60/.86)] p-6 backdrop-blur-[18px]';
 
@@ -16,6 +19,9 @@ export function Dashboard() {
   const overrides = useAssumptionStore((s) => s.overrides);
   const reports = useReports((s) => s.reports);
   const [drawer, setDrawer] = useState(false);
+  const role = useRole((s) => s.role);
+  // Oldest open reports first: they have waited longest.
+  const queue = useMemo(() => reports.filter((r) => isOpen(r.status)).sort((x, y) => Date.parse(x.createdAt) - Date.parse(y.createdAt)), [reports]);
   const analyses = useApi(() => api.analyzeBuildings(overrides, reports), [overrides, reports]);
   const communities = useApi(() => api.communities(overrides, reports), [overrides, reports]);
 
@@ -97,6 +103,28 @@ export function Dashboard() {
             <Link to="/community" className="text-[13px] font-semibold">View all reports →</Link>
           </div>
         </section>
+
+        {role === 'authority' && (
+          <section className={`${card} flex flex-col gap-3 border-sand-400/35`}>
+            <div className="flex flex-wrap items-baseline justify-between gap-3">
+              <h2 className="m-0 text-xl font-bold tracking-[-0.035em]">Review queue</h2>
+              <span className="text-[13px] text-sand-200">{queue.length} open, oldest first</span>
+            </div>
+            <div className="grid gap-4 md:grid-cols-2">
+              {queue.slice(0, 6).map((r) => (
+                <div key={r.id} className="flex flex-col gap-2.5 rounded-lg border border-white/10 bg-white/3 p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <span className="text-sm font-semibold leading-snug">{r.title}</span>
+                    <StatusChip status={r.status} />
+                  </div>
+                  <span className="text-xs text-mist-300">{placeOf(r)} · {fmtDate(r.createdAt)}</span>
+                  <StatusActions report={r} />
+                </div>
+              ))}
+            </div>
+            {queue.length > 6 && <Link to="/community" className="text-[13px] font-semibold">See all {queue.length} open reports →</Link>}
+          </section>
+        )}
 
         <section className={`${card} flex flex-col gap-3`}>
           <div className="flex flex-wrap items-baseline justify-between gap-3">

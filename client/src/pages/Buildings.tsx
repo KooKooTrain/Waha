@@ -9,6 +9,7 @@ import {
 import { api, type Source } from '../api';
 import { useAssumptionStore, useAssumptions } from '../store/assumptions';
 import { useReports } from '../store/reports';
+import { useRole } from '../store/role';
 import { AssumptionsDrawer, buildingAssumptionKeys } from '../ui/AssumptionsDrawer';
 import { BaseMap, FlyTo } from '../ui/BaseMap';
 import { PageHeader, SourceNote } from '../ui/Layout';
@@ -36,7 +37,9 @@ export function Buildings() {
   const [form, setForm] = useState<Form>({ name: '', type: 'office', area: '', hours: 0, tonnage: '', freshAir: '' });
   const [hoursTouched, setHoursTouched] = useState(false);
   const [loc, setLoc] = useState<[number, number] | null>(null);
-  const [advanced, setAdvanced] = useState(false);
+  const role = useRole((s) => s.role);
+  // Owners usually know their plant size and fresh-air flow, so show those fields straight away.
+  const [advanced, setAdvanced] = useState(role === 'owner');
   const [drawer, setDrawer] = useState(false);
   const [request, setRequest] = useState<Request | null>(null);
   const [out, setOut] = useState<{ x?: BuildingAnalysis; source?: Source; loading: boolean }>({ loading: false });
@@ -63,7 +66,7 @@ export function Buildings() {
     setForm({ name: b.name, type: b.type, area: String(b.floorAreaM2), hours: 0, tonnage: '', freshAir: '' });
     setHoursTouched(false);
     setLoc([b.lat, b.lng]);
-    setAdvanced(false);
+    setAdvanced(role === 'owner');
   };
 
   const edit = (patch: Partial<Form>) => {

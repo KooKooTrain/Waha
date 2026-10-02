@@ -1,7 +1,7 @@
 import express, { type ErrorRequestHandler, type Response } from 'express';
 import {
-  BUILDINGS, BuildingSchema, CAPTURE_ZONES, CatchmentSchema, OverridesSchema, ReportInputSchema, SAMPLE_REPORTS,
-  analyzeBuilding, createReport, estimateRunoff, findCommunities, nearestBuilding, withOverrides, type Report,
+  BUILDINGS, BuildingSchema, CAPTURE_ZONES, CatchmentSchema, OverridesSchema, ReportInputSchema, SAMPLE_REPORTS, StatusChangeSchema,
+  analyzeBuilding, changeStatus, createReport, estimateRunoff, findCommunities, nearestBuilding, withOverrides, type Report,
 } from '@waha/shared';
 import { z } from 'zod';
 
@@ -65,6 +65,22 @@ app.post('/api/reports', (req, res) => {
   const report = createReport(input, reporter, nearestBuilding(input.lat, input.lng, BUILDINGS, a['community.radiusKm'].value)?.id);
   reports = [report, ...reports];
   res.status(201).json(report);
+});
+
+// No auth in this prototype: the role comes from the client. changeStatus still refuses anyone but the authority,
+// and refuses moves that go backwards. Real sign-in would replace `by` with the session's role.
+app.patch('/api/reports/:id/status', (req, res) => {
+  const body = StatusChangeSchema.safeParse(req.body);
+  if (!body.success) return invalid(res, body.error);
+  const current = reports.find((r) => r.id === req.params.id);
+  if (!current) return res.status(404).json({ error: 'No report with that id' });
+  try {
+    const next = changeStatus(current, body.data.to, body.data.by, body.data.note);
+    reports = reports.map((r) => (r.id === next.id ? next : r));
+    res.json(next);
+  } catch (e) {
+    res.status(409).json({ error: (e as Error).message });
+  }
 });
 
 // Bad overrides throw from OverridesSchema.parse; anything else is a real bug.

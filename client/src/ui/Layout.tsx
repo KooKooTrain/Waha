@@ -1,5 +1,8 @@
 import type { ReactNode } from 'react';
 import { Link, NavLink, Outlet } from 'react-router';
+import { UserRound } from 'lucide-react';
+import type { Role } from '@waha/shared';
+import { ROLE_LABELS, useRole } from '../store/role';
 import './water-flow.js';
 import { cx } from './kit';
 
@@ -16,7 +19,7 @@ export function Logo({ size = 24 }: { size?: number }) {
   );
 }
 
-export function Nav({ light = false, right }: { light?: boolean; right?: ReactNode }) {
+export function Nav({ light = false, right = <RoleSwitcher /> }: { light?: boolean; right?: ReactNode }) {
   return (
     <nav className={cx(
       'relative z-[1100] mx-auto mt-4 grid w-[min(1180px,calc(100%-32px))] grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-full border border-white/20 px-4 py-2.5 shadow-glass backdrop-blur-[20px] backdrop-saturate-[140%] sm:grid-cols-[110px_minmax(0,1fr)_110px] sm:px-[22px]',
@@ -43,6 +46,29 @@ export function Nav({ light = false, right }: { light?: boolean; right?: ReactNo
       </div>
       <div className="flex justify-end">{right}</div>
     </nav>
+  );
+}
+
+/** No sign-in in this prototype. Switch roles to see what residents, owners and the authority each get. */
+export function RoleSwitcher() {
+  const role = useRole((s) => s.role);
+  const setRole = useRole((s) => s.setRole);
+  return (
+    <label className="relative flex items-center">
+      <span className="sr-only">Viewing as</span>
+      <UserRound size={14} strokeWidth={1.75} aria-hidden className={cx('pointer-events-none absolute left-2.5', role === 'authority' ? 'text-lagoon-950' : 'text-sand-200')} />
+      <select
+        value={role}
+        onChange={(e) => setRole(e.target.value as Role)}
+        title="Switch role"
+        className={cx(
+          'max-w-[118px] cursor-pointer appearance-none truncate rounded-full border py-1.5 pl-7 pr-3 text-xs font-semibold',
+          role === 'authority' ? 'border-sand-400 bg-sand-400 text-lagoon-950' : 'border-white/25 bg-white/6 text-mist-50',
+        )}
+      >
+        {(Object.keys(ROLE_LABELS) as Role[]).map((r) => <option key={r} value={r} className="bg-lagoon-900 text-mist-50">{ROLE_LABELS[r]}</option>)}
+      </select>
+    </label>
   );
 }
 

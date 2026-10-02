@@ -8,6 +8,8 @@ import {
 import { api, useApi } from '../api';
 import { useAssumptionStore } from '../store/assumptions';
 import { useReports } from '../store/reports';
+import { ROLE_LABELS, useRole } from '../store/role';
+import { StatusActions } from '../ui/StatusActions';
 import { BaseMap, FitTo, FlyTo, InvalidateSize } from '../ui/BaseMap';
 import { PageHeader, SourceNote } from '../ui/Layout';
 import { ConfidenceMeter, EstimateBadge, KIND_META, STATUS_HEX, StatusChip, StatusTimeline, cx, fmt, fmtDate } from '../ui/kit';
@@ -26,6 +28,7 @@ export function Community() {
   const [focus, setFocus] = useState<string | null>(null);
   const [formOpen, setFormOpen] = useState(false);
   const communities = useApi(() => api.communities(overrides, reports), [overrides, reports]);
+  const role = useRole((s) => s.role);
 
   const list = reports.filter((r) => (kind === 'all' || r.kind === kind) && (status === 'all' || r.status === status));
   const focused = reports.find((r) => r.id === focus);
@@ -42,6 +45,14 @@ export function Community() {
           Report an opportunity
         </button>
       </PageHeader>
+
+      {role === 'authority' && (
+        <div className="mx-auto max-w-[1280px] px-4 pb-4 sm:px-6">
+          <p className="m-0 rounded-md border border-sand-400/35 bg-sand-400/10 px-4 py-3 text-sm text-sand-200">
+            You’re reviewing as the authority. Open any report to move it along. Every change shows up on the map and the dashboard straight away.
+          </p>
+        </div>
+      )}
 
       <div className="mx-auto flex max-w-[1280px] flex-wrap items-center justify-between gap-x-6 gap-y-3 px-4 pb-5 sm:px-6">
         <div className="flex flex-wrap gap-1.5">
@@ -91,8 +102,9 @@ export function Community() {
                   </span>
                 </button>
                 {open && (
-                  <div className="mt-4 animate-fade-up pl-0 sm:pl-[104px]">
+                  <div className="mt-4 flex animate-fade-up flex-col gap-3 pl-0 sm:pl-[104px]">
                     <StatusTimeline report={r} />
+                    <StatusActions report={r} />
                   </div>
                 )}
               </article>
@@ -153,6 +165,7 @@ export function Community() {
 
 function ReportForm({ onClose, onSeeOnMap }: { onClose: () => void; onSeeOnMap: (id: string) => void }) {
   const add = useReports((s) => s.add);
+  const role = useRole((s) => s.role);
   const [loc, setLoc] = useState<[number, number] | null>(null);
   const [kind, setKind] = useState<ReportKind | null>(null);
   const [description, setDescription] = useState('');
@@ -167,8 +180,8 @@ function ReportForm({ onClose, onSeeOnMap }: { onClose: () => void; onSeeOnMap: 
   }, [onClose]);
 
   const draft = useMemo(
-    () => (loc && kind ? { kind, description, lat: loc[0], lng: loc[1], reporter: 'citizen' as const } : null),
-    [loc, kind, description],
+    () => (loc && kind ? { kind, description, lat: loc[0], lng: loc[1], reporter: role } : null),
+    [loc, kind, description, role],
   );
   const valid = !!draft && ReportInputSchema.safeParse(draft).success;
 
@@ -253,7 +266,7 @@ function ReportForm({ onClose, onSeeOnMap }: { onClose: () => void; onSeeOnMap: 
               {sending ? 'Submitting…' : 'Submit report'}
             </button>
             <span className="-mt-3 text-center text-xs text-mist-300">
-              {error || (valid ? 'Reports go public once they are reviewed.' : 'Add a location, a type and at least 10 characters.')}
+              {error || (valid ? `Filed as: ${ROLE_LABELS[role]}. Reports go public once they are reviewed.` : 'Add a location, a type and at least 10 characters.')}
             </span>
           </>
         ) : (
