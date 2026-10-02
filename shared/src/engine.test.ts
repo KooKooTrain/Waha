@@ -2,11 +2,12 @@ import { describe, expect, it } from 'vitest';
 import { DEFAULT_ASSUMPTIONS as A, LITRES_PER_US_GALLON, withOverrides } from './assumptions';
 import { ABU_DHABI_CLIMATE as C } from './climate';
 import {
-  analyzeBuilding, dewPointC, estimateCondensate, estimateRainfall, findCommunities, humidityRatio,
-  rangeFromSensitivity, satPressureKPa, scoreOpportunity, toConfidence,
+  analyzeBuilding, cityTotals, dewPointC, estimateCondensate, estimateRainfall, estimateRunoff, findCommunities, humidityRatio,
+  impactOf, rangeFromSensitivity, reportStats, satPressureKPa, scoreOpportunity, toConfidence,
 } from './engine';
-import { changeStatus, nextStatuses } from './reports';
-import { BUILDINGS, SAMPLE_REPORTS } from './seed';
+import { changeStatus, createReport, mergeReports, nextStatuses } from './reports';
+import { OverridesSchema, ReportInputSchema } from './schemas';
+import { BUILDINGS, CAPTURE_ZONES, SAMPLE_REPORTS } from './seed';
 import type { Building, BuildingInput, Range } from './types';
 
 const ordered = (r: Range) => r.low >= 0 && r.low <= r.mid && r.mid <= r.high;
@@ -180,5 +181,65 @@ describe('report status workflow', () => {
 
   it('seed histories end on the current status', () => {
     for (const s of SAMPLE_REPORTS) expect(s.history.at(-1)!.status).toBe(s.status);
+  });
+});
+
+describe('runoff for one event', () => {
+  it('V = P × A × C, then the capture share', () => {
+    const e = estimateRunoff({ areaM2: 1000, surface: 'paved', areaSource: 'mapped' }, 254.8);
+    expect(e.runoffL.mid).toBeCloseTo(254.8 * 1000 * A['rain.c.paved'].value, 6);
+    expect(e.capturableL.mid).toBeCloseTo(e.runoffL.mid * A['rain.captureEfficiency'].value, 6);
+    expect(ordered(e.capturableL)).toBe(true);
+  });
+
+  it('every capture zone has a real outline and a positive area', () => {
+    expect(CAPTURE_ZONES.length).toBeGreaterThanOrEqual(BUILDINGS.length);
+    for (const z of CAPTURE_ZONES) {
+      expect(z.ring.length, z.id).toBeGreaterThanOrEqual(4);
+      expect(z.areaM2).toBeGreaterThan(0);
+    }
+  });
+});
+
+describe('impact and totals', () => {
+  it('1,000 m³ of water saves kWh/m³ × 1,000 kWh and that times the grid factor in CO₂', () => {
+    const x = impactOf({ low: 1e6, mid: 1e6, high: 1e6 });
+    expect(x.energyKWh.mid).toBeCloseTo(1000 * A['impact.desalKWhPerM3'].value, 6);
+    expect(x.co2Kg.mid).toBeCloseTo(1000 * A['impact.desalKWhPerM3'].value * A['impact.gridKgCO2PerKWh'].value, 6);
+  });
+
+  it('city totals add up the buildings', () => {
+    const xs = BUILDINGS.map((b) => analyzeBuilding(b, SAMPLE_REPORTS));
+    const t = cityTotals(xs);
+    expect(t.condensateL.mid).toBeCloseTo(xs.reduce((s, x) => s + x.engineering.annualL.mid, 0), 3);
+    expect(t.monthly.reduce((s, m) => s + m.condensateL, 0)).toBeCloseTo(t.condensateL.mid, 3);
+    expect(ordered(t.totalL)).toBe(true);
+  });
+
+  it('report stats count every report once', () => {
+    const s = reportStats(SAMPLE_REPORTS, new Date('2026-10-01'));
+    expect(Object.values(s.byStatus).reduce((a, b) => a + b, 0)).toBe(SAMPLE_REPORTS.length);
+  });
+});
+
+describe('new reports and merging', () => {
+  const input = { kind: 'condensate' as const, description: 'Water dripping from the units on the back wall', lat: 24.35, lng: 54.52 };
+
+  it('a new report starts submitted, with one history entry', () => {
+    const r = createReport(input, 'citizen');
+    expect(r.status).toBe('submitted');
+    expect(r.history).toHaveLength(1);
+  });
+
+  it('merging keeps the copy that has seen more status changes', () => {
+    const r = createReport(input, 'citizen');
+    const moved = changeStatus(r, 'review', 'authority');
+    expect(mergeReports([moved], [r])[0].status).toBe('review');
+    expect(mergeReports([r], [moved])[0].status).toBe('review');
+  });
+
+  it('the server rejects reports outside Abu Dhabi and unknown assumption keys', () => {
+    expect(ReportInputSchema.safeParse({ ...input, reporter: 'citizen', lat: 25.2, lng: 55.3 }).success).toBe(false);
+    expect(OverridesSchema.parse({ 'rain.yearFactor': { value: 2 }, hacked: { value: 1 } })).toEqual({ 'rain.yearFactor': { value: 2 } });
   });
 });

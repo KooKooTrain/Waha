@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type ElementType, type ReactNode } from 'react';
-import type { LucideIcon } from 'lucide-react';
+import { AirVent, CloudRain, Droplet, type LucideIcon } from 'lucide-react';
 import {
-  STATUS_LABELS, STATUS_PIPELINE, isOpen, type Confidence, type ConfidenceLevel, type Range, type Report, type ReportStatus, type Role,
+  STATUS_LABELS, STATUS_PIPELINE, isOpen, type Confidence, type ConfidenceLevel, type Range, type Report, type ReportKind, type ReportStatus, type Role,
 } from '@waha/shared';
 
 /* ---------------------------------------------------------------- formatting */
@@ -226,3 +226,16 @@ export function StatusTimeline({ report }: { report: Report }) {
     </ol>
   );
 }
+
+/* ---------------------------------------------------------------- map colours and report kinds */
+
+/** Leaflet paints with plain colours, not CSS classes. These mirror the status tokens in index.css. */
+export const STATUS_HEX: Record<ReportStatus, string> = {
+  submitted: '#A9B8FF', review: '#E8C56B', investigating: '#C9A2FF', verified: '#6EE3A8', resolved: '#5CE1E6', rejected: '#F08A6B',
+};
+
+export const KIND_META: Record<ReportKind, { label: string; Icon: LucideIcon }> = {
+  condensate: { label: 'AC discharge', Icon: AirVent },
+  rainfall: { label: 'Rain pooling', Icon: CloudRain },
+  leak: { label: 'Leak', Icon: Droplet },
+};

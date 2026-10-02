@@ -74,6 +74,20 @@ const GENERAL = {
     group: 'Rainfall', label: 'Runoff coefficient, sand or planting', unit: 'C', value: 0.15, low: 0.1, high: 0.3,
     source: 'Rational method runoff tables (ASCE/WEF MOP 77): sandy soil and lawns 0.05-0.35.',
   },
+  'rain.captureEfficiency': {
+    group: 'Rainfall', label: 'Share of runoff a tank or swale actually keeps', unit: '×', value: 0.6, low: 0.45, high: 0.75,
+    source: 'Waha assumption. First-flush diversion, overflow in big storms and evaporation all take a cut, and UAE storms are short and intense.',
+  },
+  'impact.desalKWhPerM3': {
+    group: 'Impact', label: 'Electricity to desalinate one cubic metre', unit: 'kWh/m³', value: 3.5, low: 2.81, high: 4.5,
+    source: 'Taweelah reverse osmosis plant runs at a record 2.81 kWh/m³ (ACWA Power). Older seawater RO plants run 3.5-4.5. Thermal plants use far more, so this is conservative.',
+    url: 'https://acwapower.com/en/what-we-do/projects/taweelah-ro-desalination-iwp/',
+  },
+  'impact.gridKgCO2PerKWh': {
+    group: 'Impact', label: 'CO₂ per unit of grid electricity', unit: 'kg CO₂/kWh', value: 0.39, low: 0.27, high: 0.4,
+    source: 'Abu Dhabi grid was 0.39 kg/kWh in 2018 (EAD Climate Change Strategy). The UAE targets 0.27 by 2030; DEWA reported 0.40 for 2020.',
+    url: 'https://www.ead.gov.ae/-/media/Project/EAD/EAD/Documents/Climate-Change-Strategy-in-The-Emirate-of-Abu-Dhabi.pdf',
+  },
   'community.radiusKm': {
     group: 'Communities', label: 'Max distance between neighbours', unit: 'km', value: 1, low: 0.5, high: 1.5,
     source: 'Waha assumption: about one shared tanker run or pipe loop. Feeds turf.clustersDbscan.',

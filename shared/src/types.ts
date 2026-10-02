@@ -79,10 +79,48 @@ export type CatchmentSource = 'mapped' | 'drawn' | 'documented';
 
 export type RainfallEstimate = {
   formula: string;
+  /** Runoff, V = P × A × C */
   annualL: Range;
+  /** The part of that runoff a tank or swale would actually keep */
+  capturableL: Range;
   monthlyL: MonthlyRange[];
   confidence: Confidence;
 };
+
+/** One rain event (or one year) falling on one catchment. */
+export type RunoffEstimate = {
+  formula: string;
+  depthMm: number;
+  runoffL: Range;
+  capturableL: Range;
+  confidence: Confidence;
+};
+
+/** A real surface that could catch rain: a building roof or an open car park, traced from OpenStreetMap. */
+export type CaptureZone = {
+  id: string;
+  name: string;
+  kind: 'roof' | 'parking' | 'drawn';
+  district: District;
+  surface: Surface;
+  areaM2: number;
+  lat: number;
+  lng: number;
+  /** Outline as [lng, lat] pairs */
+  ring: [number, number][];
+  buildingId?: string;
+  osm: string;
+};
+
+export type ReportInput = {
+  kind: ReportKind;
+  title?: string;
+  description: string;
+  lat: number;
+  lng: number;
+};
+
+export type Impact = { energyKWh: Range; co2Kg: Range };
 
 export type Community = {
   id: string;

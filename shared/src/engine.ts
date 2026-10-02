@@ -4,7 +4,8 @@ import { ABU_DHABI_CLIMATE, type Climate } from './climate';
 import { isOpen } from './reports';
 import type {
   Building, BuildingInput, CatchmentSource, Community, CondensateEstimate, CondensateMethod, Confidence,
-  ConfidenceLevel, OpportunityScore, RainfallEstimate, Range, Report, ScorePart, Surface,
+  ConfidenceLevel, Impact, OpportunityScore, RainfallEstimate, Range, Report, ReportKind, ReportStatus, RunoffEstimate,
+  ScorePart, Surface,
 } from './types';
 
 /* ---------------------------------------------------------------- ranges + confidence */
@@ -148,7 +149,7 @@ export function estimateCondensate(
   const agree = a['confidence.agreeWithin'].value;
   const factors: Factor[] = [
     b.floorAreaSource === 'documented'
-      ? { score: 1, reason: 'Floor area comes from a published figure' }
+      ? { score: 1, reason: 'Floor area is a known figure, not an estimate' }
       : { score: a['confidence.estimatedArea'].value, reason: 'Floor area is estimated from footprint × floors' },
     method === 'engineering'
       ? { score: a['confidence.engineeringMethod'].value, reason: 'Psychrometric method, built on Abu Dhabi humidity normals' }
@@ -186,17 +187,43 @@ export function estimateRainfall(
   const inputs = { year: rangeOf(a['rain.yearFactor']), runoff: rangeOf(a[`rain.c.${surface}`]) };
   const month = (v: Record<'year' | 'runoff', number>, i: number) => c.months[i].rainMm * v.year * areaM2 * v.runoff;
   const annual = rangeFromSensitivity((v) => c.months.reduce((s, _, i) => s + month(v, i), 0), inputs);
+  const total = c.months.reduce((s, m) => s + m.rainMm, 0);
+  const capturable = rangeFromSensitivity(
+    (v) => total * v.year * areaM2 * v.runoff * v.capture,
+    { ...inputs, capture: rangeOf(a['rain.captureEfficiency']) },
+  );
 
   return {
     formula: 'Litres = rainfall (mm) × catchment area (m²) × runoff coefficient',
     annualL: annual,
+    capturableL: capturable,
     monthlyL: c.months.map((mo, i) => ({ month: mo.month, ...rangeFromSensitivity((v) => month(v, i), inputs) })),
-    confidence: toConfidence([
-      areaSource === 'documented'
-        ? { score: 1, reason: 'Catchment area comes from a published figure' }
-        : { score: a['confidence.mappedArea'].value, reason: areaSource === 'drawn' ? 'Catchment drawn on the map' : 'Roof traced from OpenStreetMap' },
-      spreadFactor(annual),
-    ], a),
+    confidence: toConfidence([areaFactor(areaSource, a), spreadFactor(annual)], a),
+  };
+}
+
+function areaFactor(areaSource: CatchmentSource, a: Assumptions): Factor {
+  return areaSource === 'documented'
+    ? { score: 1, reason: 'Catchment area is a known figure' }
+    : { score: a['confidence.mappedArea'].value, reason: areaSource === 'drawn' ? 'Catchment drawn on the map' : 'Outline traced from OpenStreetMap' };
+}
+
+/** One storm or one year of rain on a catchment: V = P × A × C, then the share you could keep. */
+export function estimateRunoff(
+  { areaM2, surface, areaSource }: CatchmentInput,
+  depthMm: number,
+  a: Assumptions = DEFAULT_ASSUMPTIONS,
+): RunoffEstimate {
+  const runoff = rangeOf(a[`rain.c.${surface}`]);
+  const capture = rangeOf(a['rain.captureEfficiency']);
+  const runoffL = rangeFromSensitivity((v) => depthMm * areaM2 * v.runoff, { runoff });
+  const capturableL = rangeFromSensitivity((v) => depthMm * areaM2 * v.runoff * v.capture, { runoff, capture });
+  return {
+    formula: 'Litres = rain depth (mm) × area (m²) × runoff coefficient × capture share',
+    depthMm,
+    runoffL,
+    capturableL,
+    confidence: toConfidence([areaFactor(areaSource, a), spreadFactor(capturableL)], a),
   };
 }
 
@@ -336,4 +363,106 @@ export function findCommunities(
       confidence,
     };
   });
+}
+
+/* ---------------------------------------------------------------- impact */
+
+/** Water you don't have to desalinate is electricity you don't burn, and CO₂ you don't emit. */
+export function impactOf(litresPerYear: Range, a: Assumptions = DEFAULT_ASSUMPTIONS): Impact {
+  const inputs = { litres: litresPerYear, kwh: rangeOf(a['impact.desalKWhPerM3']), grid: rangeOf(a['impact.gridKgCO2PerKWh']) };
+  return {
+    energyKWh: rangeFromSensitivity((v) => (v.litres / 1000) * v.kwh, { litres: inputs.litres, kwh: inputs.kwh }),
+    co2Kg: rangeFromSensitivity((v) => (v.litres / 1000) * v.kwh * v.grid, inputs),
+  };
+}
+
+/* ---------------------------------------------------------------- totals */
+
+export type CityTotals = {
+  buildings: number;
+  condensateL: Range;
+  rainCapturableL: Range;
+  totalL: Range;
+  monthly: { month: string; condensateL: number; rainL: number }[];
+  impact: Impact;
+};
+
+/**
+ * Adds up building analyses. Summing low with low and high with high is deliberately cautious:
+ * it assumes every building errs the same way, so the band is wider than it strictly needs to be.
+ */
+export function cityTotals(analyses: BuildingAnalysis[], a: Assumptions = DEFAULT_ASSUMPTIONS, c: Climate = ABU_DHABI_CLIMATE): CityTotals {
+  const condensateL = sumRanges(analyses.map((x) => x.engineering.annualL));
+  const rainCapturableL = sumRanges(analyses.map((x) => x.rainfall.capturableL));
+  const totalL = sumRanges([condensateL, rainCapturableL]);
+  const keep = a['rain.captureEfficiency'].value;
+  return {
+    buildings: analyses.length,
+    condensateL,
+    rainCapturableL,
+    totalL,
+    monthly: c.months.map((m, i) => ({
+      month: m.month,
+      condensateL: analyses.reduce((s, x) => s + x.engineering.monthlyL[i].mid, 0),
+      rainL: analyses.reduce((s, x) => s + x.rainfall.monthlyL[i].mid * keep, 0),
+    })),
+    impact: impactOf(totalL, a),
+  };
+}
+
+export type ReportStats = {
+  total: number;
+  open: number;
+  byStatus: Record<ReportStatus, number>;
+  byKind: Record<ReportKind, number>;
+  last30Days: number;
+};
+
+export function reportStats(reports: Report[], now: Date = new Date()): ReportStats {
+  const byStatus = { submitted: 0, review: 0, investigating: 0, verified: 0, resolved: 0, rejected: 0 };
+  const byKind = { condensate: 0, rainfall: 0, leak: 0 };
+  const cutoff = now.getTime() - 30 * 86_400_000;
+  for (const r of reports) {
+    byStatus[r.status]++;
+    byKind[r.kind]++;
+  }
+  return {
+    total: reports.length,
+    open: reports.filter((r) => isOpen(r.status)).length,
+    byStatus,
+    byKind,
+    last30Days: reports.filter((r) => Date.parse(r.createdAt) >= cutoff).length,
+  };
+}
+
+/** The closest building within `maxKm`, so a new report can be tied to it. */
+export function nearestBuilding(lat: number, lng: number, buildings: Building[], maxKm: number): Building | undefined {
+  const here = turf.point([lng, lat]);
+  let best: Building | undefined;
+  let bestKm = maxKm;
+  for (const b of buildings) {
+    const km = turf.distance(here, turf.point([b.lng, b.lat]));
+    if (km <= bestKm) {
+      best = b;
+      bestKm = km;
+    }
+  }
+  return best;
+}
+
+/* ---------------------------------------------------------------- geometry helpers */
+
+export { sumRanges };
+
+/** Area of a [lng, lat] ring in m², via turf. */
+export function polygonAreaM2(ring: [number, number][]): number {
+  const closed = ring[0][0] === ring.at(-1)![0] && ring[0][1] === ring.at(-1)![1] ? ring : [...ring, ring[0]];
+  return turf.area(turf.polygon([closed]));
+}
+
+/** Rain reports tied to a zone: linked to its building, or dropped inside its outline. */
+export function rainReportsIn(zone: { ring: [number, number][]; buildingId?: string }, reports: Report[]): Report[] {
+  const poly = turf.polygon([zone.ring]);
+  return reports.filter((r) => r.kind === 'rainfall' && r.status !== 'rejected'
+    && ((zone.buildingId && r.buildingId === zone.buildingId) || turf.booleanPointInPolygon(turf.point([r.lng, r.lat]), poly)));
 }

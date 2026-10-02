@@ -1,5 +1,6 @@
 import { STATUS_PIPELINE } from './reports';
-import type { Building, District, Report, ReportKind, ReportStatus, Role, Source } from './types';
+import geo from './geo.json';
+import type { Building, CaptureZone, District, Report, ReportKind, ReportStatus, Role, Source } from './types';
 
 /*
  * Real buildings. Footprints come from OpenStreetMap (pulled 2 Oct 2026, measured with turf.area).
@@ -208,3 +209,29 @@ export const SAMPLE_REPORTS: Report[] = ROWS.map(
     sample: true,
   }),
 );
+
+/*
+ * Capture zones: every seed building's real roof outline, plus the biggest open car parks in each district.
+ * Outlines come from OpenStreetMap (pulled 3 Oct 2026, simplified with turf.simplify).
+ */
+
+const footprints = geo.footprints as unknown as Record<string, [number, number][]>;
+
+export const CAPTURE_ZONES: CaptureZone[] = [
+  ...BUILDINGS.filter((b) => footprints[b.id]).map((b): CaptureZone => ({
+    id: b.id,
+    name: `${b.name} roof`,
+    kind: 'roof',
+    district: b.district,
+    // Industrial sheds in Mussafah are usually metal-clad; everything else is treated as a flat concrete roof.
+    surface: b.type === 'industrial' ? 'roofMetal' : 'roofConcrete',
+    areaM2: b.roofAreaM2,
+    lat: b.lat,
+    lng: b.lng,
+    ring: footprints[b.id],
+    buildingId: b.id,
+    osm: b.sources[0].url,
+  })),
+  ...(geo.parking as unknown as { id: string; osm: string; name: string; district: District; areaM2: number; lat: number; lng: number; ring: [number, number][] }[])
+    .map((p): CaptureZone => ({ ...p, kind: 'parking', surface: 'paved', osm: `https://www.openstreetmap.org/${p.osm}` })),
+];
