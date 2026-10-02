@@ -19,11 +19,12 @@ export function Logo({ size = 24 }: { size?: number }) {
   );
 }
 
-export function Nav({ light = false, right = <RoleSwitcher /> }: { light?: boolean; right?: ReactNode }) {
+export function Nav({ light = false, right = <RoleSwitcher />, className }: { light?: boolean; right?: ReactNode; className?: string }) {
   return (
     <nav className={cx(
       'relative z-[1100] mx-auto mt-4 grid w-[min(1180px,calc(100%-32px))] grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-full border border-white/20 px-4 py-2.5 shadow-glass backdrop-blur-[20px] backdrop-saturate-[140%] sm:grid-cols-[110px_minmax(0,1fr)_110px] sm:px-[22px]',
       light ? 'bg-[rgb(4_40_56/.38)]' : 'bg-[rgb(4_40_56/.55)]',
+      className,
     )}>
       <Link to="/" aria-label="Waha home" className="flex items-center gap-2 text-mist-50 hover:text-mist-50">
         <Logo />

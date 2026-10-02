@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
+import { motion, useReducedMotion } from 'motion/react';
 import { FACTS } from '@waha/shared';
 import { api, useApi } from '../api';
 import { useAssumptionStore, useAssumptions } from '../store/assumptions';
@@ -27,6 +28,53 @@ const STEPS = [
     body: 'The authority verifies, investigates or rejects each report, and the person who sent it sees the status change.' },
 ];
 
+const EASE = [0.22, 1, 0.36, 1] as const;
+
+/** The headline surfaces like it's coming up through water: a noise displacement
+ *  shrinks to nothing as each line rises in. The filter is dropped once it settles,
+ *  so it costs nothing after the first second and a half. */
+function HeroTitle() {
+  const reduce = useReducedMotion();
+  const [settled, setSettled] = useState(!!reduce);
+  return (
+    <>
+      {!settled && (
+        <svg aria-hidden className="absolute size-0">
+          <filter id="hero-ripple" x="-10%" y="-20%" width="120%" height="140%">
+            <motion.feTurbulence
+              type="fractalNoise" numOctaves={2} seed={7} result="noise"
+              initial={{ baseFrequency: '0.006 0.06' }} animate={{ baseFrequency: '0.012 0.02' }}
+              transition={{ duration: 1.8, ease: EASE }}
+            />
+            <motion.feDisplacementMap
+              in="SourceGraphic" in2="noise" xChannelSelector="R" yChannelSelector="G"
+              initial={{ scale: 70 }} animate={{ scale: 0 }}
+              transition={{ duration: 1.8, ease: EASE }}
+              onAnimationComplete={() => setSettled(true)}
+            />
+          </filter>
+        </svg>
+      )}
+      <h1
+        style={{ filter: settled ? undefined : 'url(#hero-ripple)' }}
+        className="m-0 text-[clamp(56px,11.5vw,176px)] leading-[.9] tracking-display text-[#F4F9F9] [text-shadow:0_2px_24px_rgb(3_40_56/.45),0_10px_70px_rgb(3_30_44/.5)]"
+      >
+        {['EVERY DROP,', 'FOUND.'].map((line, i) => (
+          <motion.span
+            key={line}
+            className="block"
+            initial={reduce ? false : { opacity: 0, y: '0.3em' }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1.2, delay: 0.15 + i * 0.18, ease: EASE }}
+          >
+            {line}
+          </motion.span>
+        ))}
+      </h1>
+    </>
+  );
+}
+
 const EXAMPLE_ID = 'al-bahr-towers';
 const TOWER_ID = 'adia-tower';
 
@@ -35,6 +83,7 @@ export function Landing() {
   const overrides = useAssumptionStore((s) => s.overrides);
   const reports = useReports((s) => s.reports);
   const [showAssumptions, setShowAssumptions] = useState(false);
+  const reduce = useReducedMotion();
   const analyses = useApi(() => api.analyzeBuildings(overrides, reports), [overrides, reports]);
   const example = analyses.data?.find((x) => x.building.id === EXAMPLE_ID);
   const tower = analyses.data?.find((x) => x.building.id === TOWER_ID);
@@ -58,20 +107,24 @@ export function Landing() {
 
   return (
     <div className="relative min-h-screen overflow-x-hidden">
-      <Water intensity="1" speed="1" sand="0.5" tint="" />
+      <Water intensity="1" speed="1.6" sand="0.5" tint="" />
 
       <header className="relative z-10 flex min-h-[max(680px,100vh)] flex-col overflow-hidden">
-        <Nav light />
-        <div className="relative flex flex-1 animate-fade-up flex-col items-center justify-center bg-[radial-gradient(42%_34%_at_50%_50%,rgb(3_40_56/.42),rgb(3_40_56/0)_100%)] px-5 pb-[120px] pt-16 text-center">
-          <h1 className="m-0 text-[clamp(56px,11.5vw,176px)] leading-[.9] tracking-display text-[#F4F9F9] [text-shadow:0_2px_24px_rgb(3_40_56/.45),0_10px_70px_rgb(3_30_44/.5)]">
-            EVERY DROP,<br />FOUND.
-          </h1>
-          <p className="m-0 mt-7 max-w-[34ch] text-[clamp(17px,1.6vw,21px)] font-semibold text-[#F4F9F9] [text-shadow:0_1px_16px_rgb(3_40_56/.7)]">
-            Mapping the water Abu Dhabi is already losing.
-          </p>
-          <Link to="/map" className="mt-[34px] inline-flex items-center gap-2.5 rounded-full bg-sand-400 px-6 py-[13px] text-[15px] font-semibold text-lagoon-950 shadow-cta transition hover:-translate-y-0.5 hover:bg-sand-300 hover:text-lagoon-950">
-            Explore the map <span className="text-[17px] leading-none">→</span>
-          </Link>
+        <Nav light className="animate-bob" />
+        <div className="relative flex flex-1 flex-col items-center justify-center bg-[radial-gradient(42%_34%_at_50%_50%,rgb(3_40_56/.42),rgb(3_40_56/0)_100%)] px-5 pb-[120px] pt-16 text-center">
+          <HeroTitle />
+          <motion.div
+            className="flex flex-col items-center"
+            initial={reduce ? false : { opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.7, ease: EASE }}
+          >
+            <p className="m-0 mt-7 max-w-[34ch] text-[clamp(17px,1.6vw,21px)] font-semibold text-[#F4F9F9] [text-shadow:0_1px_16px_rgb(3_40_56/.7)]">
+              Mapping the water Abu Dhabi is already losing.
+            </p>
+            <Link to="/map" className="btn-liquid mt-[34px] inline-flex items-center gap-2.5 bg-sand-400 px-6 py-[13px] text-[15px] font-semibold text-lagoon-950 shadow-cta hover:-translate-y-0.5 hover:bg-sand-300 hover:text-lagoon-950">
+              Explore the map <span className="text-[17px] leading-none">→</span>
+            </Link>
+          </motion.div>
         </div>
       </header>
 
@@ -197,7 +250,7 @@ export function Landing() {
         <section className="mx-auto max-w-[1180px] px-4 pb-[140px] pt-[120px] text-center sm:px-6">
           <h2 className="mx-auto m-0 max-w-[14ch] text-[clamp(44px,7vw,104px)] leading-[.92] tracking-display">Find the water near you.</h2>
           <div className="mt-9 flex flex-wrap justify-center gap-3">
-            <Link to="/map" className="rounded-full bg-sand-400 px-6 py-[13px] text-[15px] font-semibold text-lagoon-950 hover:bg-sand-300 hover:text-lagoon-950">Explore the map</Link>
+            <Link to="/map" className="btn-liquid bg-sand-400 px-6 py-[13px] text-[15px] font-semibold text-lagoon-950 hover:bg-sand-300 hover:text-lagoon-950">Explore the map</Link>
             <Link to="/community" className="rounded-full border border-white/32 bg-white/8 px-6 py-[13px] text-[15px] font-semibold text-mist-50 hover:bg-white/16 hover:text-mist-50">Report an opportunity</Link>
           </div>
         </section>

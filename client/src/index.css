@@ -28,6 +28,8 @@
   @keyframes waha-fade { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
   @keyframes waha-slide { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: none; } }
   @keyframes waha-pulse { 0%, 100% { opacity: .45; } 50% { opacity: .9; } }
+  --animate-bob: waha-bob 7s ease-in-out infinite;
+  @keyframes waha-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
 
   --color-status-submitted: #a9b8ff;     --color-status-review: #e8c56b;
   --color-status-investigating: #c9a2ff; --color-status-verified: #6ee3a8;
@@ -69,6 +71,22 @@
   }
   h1, h2, h3, h4 { @apply font-display font-black; }
   a { @apply text-aqua-300 hover:text-mist-50; }
+}
+
+/* Liquid button. On hover the pill melts into a blob, keeps wobbling while you stay,
+   and settles back when you leave. Unlayered on purpose so it beats Tailwind's rounded/transition. */
+.btn-liquid {
+  border-radius: 24px;
+  transition: border-radius .6s cubic-bezier(.34, 1.56, .64, 1), translate .3s ease, background-color .2s, color .2s;
+}
+.btn-liquid:hover, .btn-liquid:focus-visible {
+  border-radius: 40px 22px 44px 20px / 30px 18px 30px 18px;
+  animation: waha-liquid 2.8s ease-in-out .6s infinite;
+}
+@keyframes waha-liquid {
+  0%, 100% { border-radius: 40px 22px 44px 20px / 30px 18px 30px 18px; }
+  33% { border-radius: 22px 42px 24px 46px / 18px 30px 20px 28px; }
+  66% { border-radius: 34px 30px 20px 40px / 26px 22px 28px 20px; }
 }
 
 /* Motion is decoration. Respect people who turn it off. */
