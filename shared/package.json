@@ -1,0 +1,11 @@
+{
+  "name": "@waha/shared",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "dependencies": {
+    "@turf/turf": "^7.4.0",
+    "zod": "^4.6.5"
+  }
+}
