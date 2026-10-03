@@ -13,7 +13,7 @@ void main(){
  vec2 fc=gl_FragCoord.xy,uv=fc*px;
  vec4 c=texture2D(s,uv);
  float n=texture2D(s,uv+vec2(px.x,0.)).r+texture2D(s,uv-vec2(px.x,0.)).r+texture2D(s,uv+vec2(0.,px.y)).r+texture2D(s,uv-vec2(0.,px.y)).r;
- float h=(n*.5-c.g)*.986;
+ float h=(n*.5-c.g)*.995;
  vec2 pa=fc-p0,ba=p1-p0;
  float d=length(pa-ba*clamp(dot(pa,ba)/max(dot(ba,ba),1e-4),0.,1.));
  h-=str*exp(-d*d/(rad*rad));
@@ -47,10 +47,13 @@ void main(){
   float hl=texture2D(hm,uv-vec2(hp.x,0.)).r,hr=texture2D(hm,uv+vec2(hp.x,0.)).r;
   float hd=texture2D(hm,uv-vec2(0.,hp.y)).r,hu=texture2D(hm,uv+vec2(0.,hp.y)).r;
   vec2 g=vec2(hr-hl,hu-hd)*hk;
-  disp+=g*.12;ring+=(g.x-g.y)*3.;
+  disp+=g*.22;ring+=clamp((g.x-g.y)*5.,-1.5,1.5);
  }
  p+=disp;
- float T=t*.035;
+ float T=t*.07;
+ // Long swells plus two cross swells, so the whole surface keeps heaving like open sea.
+ float sw=sin(dot(p,vec2(1.9,.8))*2.6-t*1.1)+.6*sin(dot(p,vec2(-.7,1.7))*3.4-t*1.5)+.35*sin(dot(p,vec2(1.2,-1.3))*5.1-t*2.1);
+ p+=vec2(.8,.35)*sw*.035;
  p+=vec2(T*1.1,-T*.55);
  vec2 q=vec2(fbm(p+vec2(0.,T)),fbm(p+vec2(5.2,1.3)-T));
  vec2 w=vec2(fbm(p+3.*q+vec2(1.7,9.2)+T*1.4),fbm(p+3.*q+vec2(8.3,2.8)-T*1.1));
@@ -60,9 +63,10 @@ void main(){
  c=mix(c,shal,smoothstep(.5,.9,f+length(w)*.15)*.75);
  float sb=smoothstep(.54,.76,fbm(p*.45+w*.35+vec2(3.1,7.7)))*sa;
  c=mix(c,mix(shal,sand,.7),sb*.85);
- float cs=caus(p+w*.6,t*.12);
+ float cs=caus(p+w*.6,t*.25);
  c+=foam*pow(cs,1.8)*.6*(.5+.5*smoothstep(.3,.8,f));
  c+=foam*ring*.22+foam*abs(ring)*.12;
+ c+=foam*smoothstep(.9,1.8,sw)*.07;c-=.03*smoothstep(-.4,-1.6,sw);
  float v=smoothstep(1.3,.2,length((uv-.5)*vec2(1.1,1.4)));
  c*=mix(.92,1.03,v);
  c=mix(vec3(.04,.36,.48),c,k);
@@ -92,6 +96,7 @@ void main(){
       const uR = main.U('r'), uT = main.U('t'), uRT = main.U('rt'), uK = main.U('k'), uS = main.U('sa'), uP = main.U('rp');
       const uHM = main.U('hm'), uHP = main.U('hp'), uHK = main.U('hk');
       const rip = new Float32Array(N * 4).fill(-99); let ri = 0;
+      // Reduced motion slows the water down instead of freezing it. The page is mostly water, so a still frame looks broken.
       const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
       const scale = 0.5;
 
@@ -104,15 +109,15 @@ void main(){
       const blank = tex();
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(4));
 
-      // Wave simulation: two half-float textures we ping-pong between, at half the canvas resolution.
+      // Wave simulation: two half-float textures we ping-pong between, at canvas resolution.
       let sim = null;
-      if (isGL2 && !reduce && (gl.getExtension('EXT_color_buffer_float') || gl.getExtension('EXT_color_buffer_half_float'))) {
+      if (isGL2 && (gl.getExtension('EXT_color_buffer_float') || gl.getExtension('EXT_color_buffer_half_float'))) {
         const s = link(SIM_FS);
         sim = { p: s.p, uS: s.U('s'), uPx: s.U('px'), uP0: s.U('p0'), uP1: s.U('p1'), uStr: s.U('str'), uRad: s.U('rad'),
           tex: [tex(), tex()], fb: [gl.createFramebuffer(), gl.createFramebuffer()], i: 0, w: 0, h: 0 };
       }
       const simSize = () => {
-        const w = Math.max(1, cv.width / 2 | 0), h = Math.max(1, cv.height / 2 | 0);
+        const w = cv.width, h = cv.height;
         if (!sim || (sim.w === w && sim.h === h)) return;
         sim.w = w; sim.h = h;
         for (let j = 0; j < 2 && sim; j++) {
@@ -138,9 +143,10 @@ void main(){
       };
       let cur = null, prev = null, splash = 0;
       const addRipple = (e, strength, force) => {
-        if (reduce || this.getAttribute('ripples') === 'false') return;
+        if (this.getAttribute('ripples') === 'false') return;
         const q = norm(e); if (!q) return;
-        if (sim) { cur = q; if (force) splash = strength; return; }
+        // The sim drags a wake behind the cursor. The rings on top give it the classic ripple look.
+        if (sim) { cur = q; if (force) splash = strength; }
         const x = q[0] * cv.width, y = q[1] * cv.height;
         if (!force && (Math.hypot(x - lx, y - ly) < cv.height * 0.06 || real - lt < 0.07)) return;
         lx = x; ly = y; lt = real;
@@ -163,22 +169,22 @@ void main(){
         gl.drawArrays(gl.TRIANGLES, 0, 3);
         sim.i = dst;
       };
-      // Fixed 60 Hz steps so waves travel at the same speed on 60 Hz and 144 Hz screens.
+      // Fixed 120 Hz steps so waves travel at the same speed on 60 Hz and 144 Hz screens.
       let acc = 0;
       const simulate = dt => {
-        acc = Math.min(acc + dt, 3 / 60);
-        let p0 = [0, 0], p1 = [0, 0], str = 0, rad = sim.h * 0.022;
+        acc = Math.min(acc + dt, 6 / 120);
+        let p0 = [0, 0], p1 = [0, 0], str = 0, rad = sim.h * 0.014;
         if (cur) {
           const a = prev || cur;
           p0 = [a[0] * sim.w, a[1] * sim.h]; p1 = [cur[0] * sim.w, cur[1] * sim.h];
           const len = Math.hypot(p1[0] - p0[0], p1[1] - p0[1]);
           // A big jump means the pointer left and came back elsewhere. Don't streak across the screen.
           if (len > sim.h * 0.3) p0 = p1;
-          else str = Math.min(len * 0.035, 0.45);
+          else str = Math.min(len * 0.03, 0.35);
           if (splash) { str += splash * 0.6; rad *= 1.6; splash = 0; }
           prev = cur;
         }
-        while (acc >= 1 / 60) { acc -= 1 / 60; step(p0, p1, str, rad); str = 0; }
+        while (acc >= 1 / 120) { acc -= 1 / 120; step(p0, p1, str, rad); str = 0; }
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
       };
 
@@ -196,14 +202,14 @@ void main(){
       const loop = now => {
         const dt = Math.min(0.1, (now - last) / 1000); last = now;
         if (visible) {
-          real += dt; time += dt * parseFloat(this.getAttribute('speed') ?? '1'); size();
+          real += dt; time += dt * parseFloat(this.getAttribute('speed') ?? '1') * (reduce ? 0.5 : 1); size();
           if (sim) simulate(dt);
           draw();
         }
         this._raf = requestAnimationFrame(loop);
       };
       size(); draw();
-      if (!reduce) this._raf = requestAnimationFrame(loop);
+      this._raf = requestAnimationFrame(loop);
     }
     disconnectedCallback() {
       cancelAnimationFrame(this._raf); this._ro?.disconnect(); this._io?.disconnect();
