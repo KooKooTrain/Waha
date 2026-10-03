@@ -10,6 +10,7 @@ import { Community } from './pages/Community';
 import { Dashboard } from './pages/Dashboard';
 import { Kit } from './pages/Kit';
 import { Landing } from './pages/Landing';
+import { Privacy, Terms } from './pages/Legal';
 import { MapPage } from './pages/MapPage';
 import { Methodology } from './pages/Methodology';
 import { Rainfall } from './pages/Rainfall';
@@ -30,6 +31,8 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/community" element={<Community />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/methodology" element={<Methodology />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>

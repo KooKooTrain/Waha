@@ -3,6 +3,7 @@ import { Building2, CloudRain, Gauge } from 'lucide-react';
 import { BUILDINGS, REPORT_STATUSES, SAMPLE_REPORTS, analyzeBuilding } from '@waha/shared';
 import { useAssumptions } from '../store/assumptions';
 import { AssumptionsDrawer, buildingAssumptionKeys } from '../ui/AssumptionsDrawer';
+import { Footer } from '../ui/Layout';
 import { ConfidenceMeter, EstimateBadge, GlassCard, RangeBar, StatTile, StatusChip, StatusTimeline, fmt } from '../ui/kit';
 
 /** A review page for the UI kit. Every number on it comes straight from the shared engine. */
@@ -109,6 +110,7 @@ export function Kit() {
         keys={buildingAssumptionKeys(b.type)}
         formula={x.engineering.formula}
       />
+      <Footer />
     </div>
   );
 }

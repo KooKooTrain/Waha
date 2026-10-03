@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from 'react';
 import { Link, NavLink, Outlet } from 'react-router';
-import { UserRound } from 'lucide-react';
+import { Mail, Phone, UserRound } from 'lucide-react';
 import type { Role } from '@waha/shared';
 import { ROLE_LABELS, useRole } from '../store/role';
 import './water-flow.js';
@@ -81,21 +81,63 @@ export function RoleSwitcher() {
   );
 }
 
+export const CONTACT = { email: 'yashgupta2009yg@gmail.com', phone: '+971542426839', phoneShown: '+971 54 242 6839' };
+
+const FOOTER_LINKS = [
+  ['Explore', [['/buildings', 'Buildings'], ['/rainfall', 'Rainfall'], ['/community', 'Community'], ['/map', 'Map'], ['/dashboard', 'Dashboard']]],
+  ['Learn', [['/methodology', 'Methodology'], ['/kit', 'Design system']]],
+  ['Legal', [['/privacy', 'Privacy Policy'], ['/terms', 'Terms and Conditions']]],
+] as const;
+
+/** Full-width Waha white footer. Contact details stay folded away until asked for. */
 export function Footer() {
+  const [contact, setContact] = useState(false);
   return (
-    <footer className="relative z-10 border-t border-white/16 bg-[rgb(4_40_56/.62)] backdrop-blur-[20px]">
-      <div className="mx-auto flex max-w-[1180px] flex-wrap items-center justify-between gap-x-7 gap-y-4 px-4 py-7 sm:px-6">
-        <div className="flex items-center gap-2.5">
-          <Logo size={20} />
-          <span className="font-display text-base font-black tracking-[-0.03em]">WAHA</span>
-          <span className="text-[13px] font-medium">UAE Hackathon prototype</span>
+    <footer className="waha-panel relative z-10 rounded-t-[32px] border-x-0 border-b-0">
+      <div className="mx-auto max-w-[1180px] px-4 pb-7 pt-12 sm:px-6">
+        <div className="flex flex-wrap justify-between gap-x-12 gap-y-10">
+          <div className="flex max-w-[300px] flex-col gap-4">
+            <Link to="/" aria-label="Waha home" className="flex items-center gap-2 text-[#193c4b] hover:text-[#193c4b]">
+              <Logo />
+              <span className="font-display text-[25px] font-semibold tracking-[-0.5px]">WAHA.</span>
+            </Link>
+            <p className="m-0 text-[13px] leading-relaxed text-[#66777e]">Mapping the water Abu Dhabi is already losing, one building, roof and report at a time.</p>
+            <div>
+              <button
+                type="button"
+                onClick={() => setContact((c) => !c)}
+                aria-expanded={contact}
+                aria-controls="footer-contact"
+                className="inline-flex cursor-pointer items-center gap-2 rounded-full border-0 bg-[#103f53] px-5 py-2.5 text-[13px] font-medium text-[#fff] transition-colors hover:bg-[#205e75]"
+              >
+                <Mail size={14} strokeWidth={1.75} aria-hidden />Contact me
+              </button>
+              {contact && (
+                <div id="footer-contact" className="mt-3 flex animate-fade-up flex-col gap-0.5 rounded-2xl border border-[#dce6ea] bg-[#fff] p-1.5">
+                  <a href={`mailto:${CONTACT.email}`} className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium text-[#193c4b] hover:bg-[#f5f9fa] hover:text-[#193c4b]">
+                    <Mail size={15} strokeWidth={1.75} className="text-[#08628c]" aria-hidden />{CONTACT.email}
+                  </a>
+                  <a href={`tel:${CONTACT.phone}`} className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium text-[#193c4b] hover:bg-[#f5f9fa] hover:text-[#193c4b]">
+                    <Phone size={15} strokeWidth={1.75} className="text-[#08628c]" aria-hidden />{CONTACT.phoneShown}
+                  </a>
+                </div>
+              )}
+            </div>
+          </div>
+          <nav aria-label="Footer" className="grid grid-cols-2 gap-x-14 gap-y-8 sm:grid-cols-3">
+            {FOOTER_LINKS.map(([title, links]) => (
+              <div key={title} className="flex flex-col gap-3">
+                <span className="text-[11px] font-semibold uppercase tracking-[.14em] text-[#8a9aa1]">{title}</span>
+                {links.map(([to, label]) => (
+                  <Link key={to} to={to} className="text-[13px] text-[#4d6370] transition-colors hover:text-[#193c4b]">{label}</Link>
+                ))}
+              </div>
+            ))}
+          </nav>
         </div>
-        <div className="flex flex-wrap items-center gap-4">
-          <span className="inline-flex items-center gap-2 rounded-full border border-sand-400/35 bg-[rgb(4_30_42/.35)] px-3 py-1.5 text-xs font-medium text-sand-200">
-            <span className="size-1.5 rounded-full bg-sand-400" />Prototype data. All figures are estimates.
-          </span>
-          <Link to="/methodology" className="text-[13px] font-semibold text-mist-50">Methodology</Link>
-          <Link to="/kit" className="text-[13px] font-semibold text-mist-50">Design system</Link>
+        <div className="mt-10 flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-t border-[#dce6ea] pt-5 text-xs text-[#66777e]">
+          <span>© {new Date().getFullYear()} Waha · UAE Hackathon prototype</span>
+          <span className="inline-flex items-center gap-2"><span className="size-1.5 rounded-full bg-sand-400" />Prototype data. All figures are estimates.</span>
         </div>
       </div>
     </footer>
