@@ -1,0 +1,27 @@
+<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#063c61"><meta name="description" content="Discover overlooked water resources across the UAE. Explore condensate recovery, rainfall runoff and community observations with WAHA."><title>WAHA.</title><link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='12' fill='%2307466a'/%3E%3Cpath d='M20 7C16 14 10 20 10 26a10 10 0 0020 0C30 20 24 14 20 7Z' fill='%23b5ecff'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;450;500;550;600;650;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="assets/leaflet.css"></head><body>
+<header class="site-header"><a class="brand" href="#home" aria-label="WAHA home"><svg viewBox="0 0 42 42" fill="none" aria-hidden="true"><path d="M21 4C17 12 8 22 8 29a13 13 0 0026 0c0-7-9-17-13-25Z" stroke="currentColor" stroke-width="2.4"/><path d="M12 28c6-5 11 5 18 0M13 33c6-4 10 4 16 0" stroke="currentColor" stroke-width="2"/></svg><span>WAHA.</span></a><nav aria-label="Main navigation"><a href="#home" data-nav="home">About</a><a href="#explore" data-nav="explore">Explore</a><a href="#dashboard" data-nav="dashboard">Dashboard</a><a href="#community" data-nav="community">Community</a></nav><a class="button button-header" href="#analyze">Analyze a site</a><button class="menu-toggle" aria-label="Toggle navigation" aria-expanded="false">☰</button></header>
+<main id="main"><section id="home" class="page active">
+  <div class="water-hero" id="water-stage">
+    <canvas id="water-canvas" aria-label="Interactive blue water. Move your pointer or touch to create ripples."></canvas>
+    <div class="water-shade" aria-hidden="true"></div>
+    <div class="hero-composition">
+      <h1>Every Drop,<br>Found.</h1>
+      <div class="hero-story"><p>There’s water we haven’t seen yet.<br>In our buildings. On our streets.<br>Let’s find what’s possible.</p><a class="button button-white" href="#explore">Explore opportunities</a></div>
+    </div>
+    <div class="water-bottom"><span id="water-instruction">Move gently. Make ripples.</span><button id="water-motion" aria-label="Pause water animation" aria-pressed="false"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3v10M11 3v10" stroke="currentColor" stroke-width="1.5"/></svg><span>Pause motion</span></button></div>
+  </div>
+  <section class="water-intro" id="possibilities">
+    <div class="intro-heading"><h2>Closer than<br>you think.</h2><div><p>The air conditioning above you. The rain beneath your feet. Everyday places hold overlooked water resources.</p><p>WAHA makes them visible—so we can understand their potential, and put them to use.</p></div></div>
+    <div class="resource-rows" id="how-it-works">
+      <a class="resource-row" href="#analyze?kind=building"><span class="resource-index">01</span><h3>From the air.</h3><div><span>AC condensate</span><p>See how much water your building could recover, one cooling cycle at a time.</p></div><span class="row-plus" aria-hidden="true">+</span></a>
+      <a class="resource-row" href="#analyze?kind=rainfall"><span class="resource-index">02</span><h3>From the rain.</h3><div><span>Rainfall & runoff</span><p>Understand what falls, what flows, and what could be captured.</p></div><span class="row-plus" aria-hidden="true">+</span></a>
+      <a class="resource-row" href="#community"><span class="resource-index">03</span><h3>From all of us.</h3><div><span>Community observations</span><p>Share what you notice. Put a local opportunity on the map.</p></div><span class="row-plus" aria-hidden="true">+</span></a>
+    </div>
+    <div class="home-outro"><p>A shared resource.<br>A different tomorrow.</p><a class="button button-dark" href="#analyze">Find your water potential</a></div>
+  </section>
+</section>
+<section id="explore" class="page"></section><section id="dashboard" class="page"></section><section id="analyze" class="page"></section><section id="community" class="page"></section></main><footer><a href="#home" class="footer-brand">WAHA<span>وَاحَة</span></a><p>A new perspective on water.</p><span>Made for the UAE.</span><a href="#connection" class="connection-link" id="connection-button">Demo data · API settings</a></footer><div id="toast" role="status" aria-live="polite"></div><dialog id="settings-dialog"></dialog><script src="assets/leaflet.js"></script><script src="app.js" type="module"></script><script src="water.js" type="module"></script></body></html>
