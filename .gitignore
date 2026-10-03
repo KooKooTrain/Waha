@@ -6,3 +6,6 @@ dist/
 .gstack/
 waha-extra
 .vercel
+
+.vercel
+.env*
