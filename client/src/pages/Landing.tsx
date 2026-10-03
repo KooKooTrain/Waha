@@ -110,7 +110,7 @@ export function Landing() {
       <Water intensity="1" speed="1.6" sand="0.5" tint="" />
 
       <header className="relative z-10 flex min-h-[max(680px,100vh)] flex-col overflow-hidden">
-        <Nav light className="animate-bob" />
+        <Nav className="animate-bob" />
         <div className="relative flex flex-1 flex-col items-center justify-center bg-[radial-gradient(42%_34%_at_50%_50%,rgb(3_40_56/.42),rgb(3_40_56/0)_100%)] px-5 pb-[120px] pt-16 text-center">
           <HeroTitle />
           <motion.div

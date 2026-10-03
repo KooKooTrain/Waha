@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Link, NavLink, Outlet } from 'react-router';
 import { UserRound } from 'lucide-react';
 import type { Role } from '@waha/shared';
@@ -10,43 +10,51 @@ const PAGES = [
   ['/', 'Home'], ['/buildings', 'Buildings'], ['/rainfall', 'Rainfall'], ['/community', 'Community'], ['/map', 'Map'], ['/dashboard', 'Dashboard'],
 ] as const;
 
-export function Logo({ size = 24 }: { size?: number }) {
+export function Logo({ size = 28 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden>
-      <path d="M14 13a5 5 0 1 1 5-5c0 7-4 13-13 14" stroke="#EEF5F6" strokeWidth="2.6" strokeLinecap="round" />
-      <circle cx="14" cy="8" r="1.9" fill="#F0DEB8" />
+    <svg width={size} height={size} viewBox="0 0 42 42" fill="none" aria-hidden>
+      <path d="M21 4C17 12 8 22 8 29a13 13 0 0026 0c0-7-9-17-13-25Z" stroke="currentColor" strokeWidth="2.4" />
+      <path d="M12 28c6-5 11 5 18 0M13 33c6-4 10 4 16 0" stroke="currentColor" strokeWidth="2" />
     </svg>
   );
 }
 
-export function Nav({ light = false, right = <RoleSwitcher />, className }: { light?: boolean; right?: ReactNode; className?: string }) {
+/** Floating white pill. On phones the links fold into a menu under the pill. */
+export function Nav({ right = <RoleSwitcher />, className }: { right?: ReactNode; className?: string }) {
+  const [open, setOpen] = useState(false);
   return (
-    <nav className={cx(
-      'relative z-[1100] mx-auto mt-4 grid w-[min(1180px,calc(100%-32px))] grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 rounded-full border border-white/20 px-4 py-2.5 shadow-glass backdrop-blur-[20px] backdrop-saturate-[140%] sm:grid-cols-[110px_minmax(0,1fr)_110px] sm:px-[22px]',
-      light ? 'bg-[rgb(4_40_56/.38)]' : 'bg-[rgb(4_40_56/.55)]',
+    <header className={cx(
+      'relative z-[1100] mx-auto mt-6 flex h-[70px] w-[min(1180px,calc(100%-32px))] items-center justify-between gap-5 rounded-[40px] border border-white/45 bg-white/95 pl-[26px] pr-[18px] text-[#193c4b] shadow-[inset_0_1px_0_#fff,0_12px_30px_rgb(4_40_56/.18)] backdrop-blur-[18px] max-md:h-[60px] max-md:gap-2 max-md:pl-[19px] max-md:pr-3',
       className,
     )}>
-      <Link to="/" aria-label="Waha home" className="flex items-center gap-2 text-mist-50 hover:text-mist-50">
+      <Link to="/" aria-label="Waha home" className="flex flex-none items-center gap-2 text-[#193c4b] hover:text-[#193c4b]">
         <Logo />
-        <span className="hidden font-display text-[19px] font-black tracking-[-0.03em] sm:inline">WAHA</span>
+        <span className="font-display text-[25px] font-semibold tracking-[-0.5px] max-md:text-[22px]">WAHA.</span>
       </Link>
-      <div className="flex min-w-0 justify-[safe_center] gap-1 overflow-x-auto [scrollbar-width:none]">
+      <nav
+        aria-label="Main navigation"
+        className={cx(
+          'items-center gap-8 text-[13px] font-medium max-lg:gap-5 max-md:absolute max-md:inset-x-0 max-md:top-[69px] max-md:flex-col max-md:items-stretch max-md:gap-1 max-md:rounded-2xl max-md:bg-white max-md:px-6 max-md:py-4 max-md:text-[15px] max-md:shadow-[0_15px_25px_#143a5015]',
+          open ? 'flex' : 'hidden md:flex',
+        )}
+      >
         {PAGES.map(([to, label]) => (
           <NavLink
             key={to}
             to={to}
             end={to === '/'}
-            className={({ isActive }) => cx(
-              'flex-none whitespace-nowrap rounded-full px-3.5 py-2 text-sm font-medium',
-              isActive ? 'bg-mist-50 text-lagoon-950 hover:text-lagoon-950' : 'text-mist-50 hover:bg-white/10 hover:text-mist-50',
-            )}
+            onClick={() => setOpen(false)}
+            className={({ isActive }) => cx('py-3 transition-colors', isActive ? 'text-[#193c4b] hover:text-[#193c4b]' : 'text-[#66777e] hover:text-[#193c4b]')}
           >
             {label}
           </NavLink>
         ))}
+      </nav>
+      <div className="flex items-center gap-1 max-md:ml-auto">
+        {right}
+        <button type="button" aria-label="Toggle navigation" aria-expanded={open} onClick={() => setOpen((o) => !o)} className="p-2 text-2xl leading-none md:hidden">☰</button>
       </div>
-      <div className="flex justify-end">{right}</div>
-    </nav>
+    </header>
   );
 }
 
@@ -57,14 +65,14 @@ export function RoleSwitcher() {
   return (
     <label className="relative flex items-center">
       <span className="sr-only">Viewing as</span>
-      <UserRound size={14} strokeWidth={1.75} aria-hidden className={cx('pointer-events-none absolute left-2.5', role === 'authority' ? 'text-lagoon-950' : 'text-sand-200')} />
+      <UserRound size={14} strokeWidth={1.75} aria-hidden className={cx('pointer-events-none absolute left-3.5', role === 'authority' ? 'text-lagoon-950' : 'text-white')} />
       <select
         value={role}
         onChange={(e) => setRole(e.target.value as Role)}
         title="Switch role"
         className={cx(
-          'max-w-[118px] cursor-pointer appearance-none truncate rounded-full border py-1.5 pl-7 pr-3 text-xs font-semibold',
-          role === 'authority' ? 'border-sand-400 bg-sand-400 text-lagoon-950' : 'border-white/25 bg-white/6 text-mist-50',
+          'min-h-[42px] max-w-[140px] cursor-pointer appearance-none truncate rounded-full border-0 py-2.5 pl-9 pr-5 text-[13px] font-medium transition-colors max-md:min-h-9 max-md:max-w-[118px] max-md:pl-8 max-md:pr-3 max-md:text-xs',
+          role === 'authority' ? 'bg-sand-400 text-lagoon-950 hover:bg-sand-300' : 'bg-[#103f53] text-white hover:bg-[#205e75]',
         )}
       >
         {(Object.keys(ROLE_LABELS) as Role[]).map((r) => <option key={r} value={r} className="bg-lagoon-900 text-mist-50">{ROLE_LABELS[r]}</option>)}
