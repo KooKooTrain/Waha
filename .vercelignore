@@ -1,0 +1,4 @@
+waha-extra
+node_modules
+.vercel
+client/dist
