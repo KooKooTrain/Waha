@@ -205,7 +205,7 @@ export function Landing() {
             <Link to="/methodology" className="mt-7 inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/6 px-5 py-[11px] text-sm font-semibold text-mist-50 hover:bg-white/12 hover:text-mist-50">Read the methodology</Link>
           </div>
 
-          <div className="glass-solid rounded-xl p-[26px]">
+          <div className="waha-panel rounded-xl p-[26px]">
             {example ? (
               <>
                 <div className="flex flex-wrap items-start justify-between gap-3">
