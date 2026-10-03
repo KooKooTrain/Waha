@@ -154,7 +154,7 @@ export function Methodology() {
           {GROUPS.map((g) => {
             const keys = KEYS.filter((k) => DEFAULT_ASSUMPTIONS[k].group === g);
             return (
-              <div key={g} className="glass-solid rounded-xl p-6">
+              <div key={g} className="waha-panel rounded-xl p-6">
                 <div className="mb-3 flex items-baseline justify-between gap-3">
                   <h3 className="m-0 font-sans text-xs font-semibold uppercase tracking-[.14em] text-aqua-300">{g}</h3>
                   <button onClick={() => setGroup(g)} className="cursor-pointer rounded-full border border-white/20 bg-white/6 px-3 py-1.5 text-xs font-semibold text-mist-50 hover:bg-white/12">Edit</button>
@@ -193,7 +193,7 @@ export function Methodology() {
             ))}
           </ul>
           <P muted>
-            Community reports marked “Sample” are made up for the demo and pinned to real places. Everything else on the map is a real building or surface.
+            The community reports are made up for the demo and pinned to real places. Everything else on the map is a real building or surface.
           </P>
         </Card>
       </main>
@@ -205,7 +205,7 @@ export function Methodology() {
 
 function Card({ title, tag, children }: { title: string; tag: string; children: ReactNode }) {
   return (
-    <section className="glass-solid flex flex-col gap-4 rounded-xl p-7">
+    <section className="waha-panel flex flex-col gap-4 rounded-xl p-7">
       <div className="flex flex-wrap items-baseline justify-between gap-3">
         <h2 className="m-0 text-[28px] tracking-tight">{title}</h2>
         <span className="text-xs font-semibold uppercase tracking-[.12em] text-sand-200">{tag}</span>

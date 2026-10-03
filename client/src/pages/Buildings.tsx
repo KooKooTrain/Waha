@@ -25,7 +25,7 @@ const RETROFITS = [
   { tier: 'Tier 3', name: 'Integrated dual supply', desc: 'Feeds toilet flushing and cooling-tower make-up, metered through the building management system.', line: 'border-sand-200' },
 ];
 
-const input = 'w-full rounded-[12px] border border-white/16 bg-[rgb(4_30_42/.55)] px-3.5 py-3 text-[15px] font-medium text-mist-50 outline-none focus:border-aqua-300';
+const input = 'w-full rounded-[12px] border border-white/16 bg-[#fff] px-3.5 py-3 text-[15px] font-medium text-mist-50 outline-none focus:border-aqua-300';
 const exact = (v: number) => ({ value: v, low: v, high: v });
 
 export function Buildings() {
@@ -117,7 +117,7 @@ export function Buildings() {
 
       <main className="mx-auto grid max-w-[1180px] items-start gap-6 px-4 pb-24 pt-2 sm:px-6 lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)]">
         {/* FORM */}
-        <section className="flex flex-col gap-[22px] rounded-xl border border-white/12 bg-[rgb(5_44_60/.84)] p-7 shadow-[inset_0_1px_0_rgb(255_255_255/.1)] backdrop-blur-[18px]">
+        <section className="waha-panel flex flex-col gap-[22px] rounded-xl p-7">
           <label className="flex flex-col gap-2 text-[13px] font-semibold text-sand-200">
             Try a real building
             <select
@@ -125,9 +125,9 @@ export function Buildings() {
               onChange={(e) => { const hit = BUILDINGS.find((o) => o.id === e.target.value); if (hit) pick(hit); }}
               className="w-full cursor-pointer appearance-none rounded-[12px] border border-sand-400/35 bg-sand-400/8 px-3.5 py-3 text-[15px] font-medium text-mist-50"
             >
-              <option value="" className="bg-lagoon-900">Choose one…</option>
+              <option value="">Choose one…</option>
               {BUILDINGS.map((o) => (
-                <option key={o.id} value={o.id} className="bg-lagoon-900">{o.name} · {BUILDING_TYPE_LABELS[o.type]} · {o.district}</option>
+                <option key={o.id} value={o.id}>{o.name} · {BUILDING_TYPE_LABELS[o.type]} · {o.district}</option>
               ))}
             </select>
           </label>
@@ -141,7 +141,7 @@ export function Buildings() {
 
           <div className="flex flex-col gap-2">
             <span className="text-[13px] font-semibold">Location</span>
-            <div className="flex items-center justify-between gap-3 rounded-[12px] border border-dashed border-white/24 bg-[rgb(4_30_42/.35)] px-3.5 py-3">
+            <div className="flex items-center justify-between gap-3 rounded-[12px] border border-dashed border-white/24 bg-[rgb(255_255_255/.6)] px-3.5 py-3">
               <span className={cx('text-[15px] font-medium', loc ? 'text-mist-50' : 'text-mist-300')}>
                 {loc ? `${districtOf(loc[0])} · ${loc[0].toFixed(4)}, ${loc[1].toFixed(4)}` : 'No location set'}
               </span>
@@ -153,7 +153,7 @@ export function Buildings() {
             <label className="flex flex-col gap-2 text-[13px] font-semibold">
               Building type
               <select value={form.type} onChange={(e) => { edit({ type: e.target.value as BuildingType }); setHoursTouched(false); }} className={cx(input, 'cursor-pointer appearance-none')}>
-                {BUILDING_TYPES.map((t) => <option key={t} value={t} className="bg-lagoon-900">{BUILDING_TYPE_LABELS[t]}</option>)}
+                {BUILDING_TYPES.map((t) => <option key={t} value={t}>{BUILDING_TYPE_LABELS[t]}</option>)}
               </select>
             </label>
             <label className="flex flex-col gap-2 text-[13px] font-semibold">
@@ -202,7 +202,7 @@ export function Buildings() {
             onClick={calculate}
             disabled={!canCalc || (out.loading && !x)}
             className={cx(
-              'mt-1 rounded-full border-0 px-6 py-3.5 text-[15px] font-semibold text-lagoon-950 shadow-cta',
+              'mt-1 rounded-full border-0 px-6 py-3.5 text-[15px] font-semibold text-[#04141c] shadow-cta',
               canCalc ? 'cursor-pointer bg-sand-400 hover:bg-sand-300' : 'cursor-not-allowed bg-sand-400/40',
             )}
           >
@@ -231,20 +231,20 @@ export function Buildings() {
               )}
               <FlyTo to={loc ?? undefined} zoom={13} />
             </BaseMap>
-            <div className="pointer-events-none absolute left-3 top-3 z-[500] rounded-full border border-white/20 bg-[rgb(4_40_56/.62)] px-3 py-2 text-xs font-semibold backdrop-blur-[16px]">
+            <div className="pointer-events-none absolute left-3 top-3 z-[500] waha-panel waha-panel-map rounded-full px-3 py-2 text-xs font-semibold">
               {loc ? districtOf(loc[0]) : 'Click to place your building, or pick a dot'}
             </div>
           </div>
 
           {!request && (
-            <section className="flex flex-col items-center gap-3.5 border-t border-white/30 px-7 py-14 text-center">
+            <section className="waha-panel flex flex-col items-center gap-3.5 rounded-xl px-7 py-14 text-center">
               <h2 className="m-0 text-[28px] tracking-tight">No estimate yet</h2>
               <p className="m-0 max-w-[38ch] text-[15px] leading-relaxed">Fill in the form or pick a real building, then calculate. Results show up here with their range and assumptions.</p>
             </section>
           )}
 
           {request && !x && (
-            <section className="flex flex-col gap-[18px] rounded-xl border border-white/12 bg-[rgb(5_44_60/.84)] p-7">
+            <section className="waha-panel flex flex-col gap-[18px] rounded-xl p-7">
               <span className="text-[13px] font-semibold text-sand-200">Calculating…</span>
               <div className="h-14 w-[55%] animate-pulse-soft rounded-[12px] bg-white/10" />
               <div className="h-2.5 animate-pulse-soft rounded-full bg-white/10" />
@@ -254,7 +254,7 @@ export function Buildings() {
 
           {x && b && (
             <section className={cx(
-              'flex animate-fade-up flex-col gap-7 rounded-xl border border-white/12 bg-[rgb(5_44_60/.86)] p-7 shadow-[inset_0_1px_0_rgb(255_255_255/.1)] backdrop-blur-[18px] transition-opacity',
+              'waha-panel flex animate-fade-up flex-col gap-7 rounded-xl p-7 transition-opacity',
               out.loading && 'opacity-60',
             )}>
               <div className="flex flex-wrap items-start justify-between gap-3">
@@ -364,15 +364,15 @@ function MonthlyBars({ data }: { data: { month: string; mid: number }[] }) {
     <div className="mt-[18px] h-[170px]" role="img" aria-label={`Monthly condensate, highest in ${data.find((d) => d.mid === peak)?.month}`}>
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 4, right: 0, left: 0, bottom: 0 }}>
-          <XAxis dataKey="month" tickLine={false} axisLine={false} tick={{ fill: '#A8C3C9', fontSize: 11 }} interval={0} />
+          <XAxis dataKey="month" tickLine={false} axisLine={false} tick={{ fill: '#66777e', fontSize: 11 }} interval={0} />
           <ChartTip
-            cursor={{ fill: 'rgb(255 255 255 / .05)' }}
+            cursor={{ fill: 'rgb(25 60 75 / .06)' }}
             formatter={(v) => [`${fmt(Number(v))} L`, 'Likely']}
-            contentStyle={{ background: 'rgb(4 40 56 / .95)', border: '1px solid rgb(255 255 255 / .2)', borderRadius: 10, color: '#EEF5F6', fontSize: 12 }}
-            labelStyle={{ color: '#A8C3C9' }}
+            contentStyle={{ background: '#fff', border: '1px solid #dce6ea', borderRadius: 10, color: '#193c4b', fontSize: 12 }}
+            labelStyle={{ color: '#66777e' }}
           />
           <Bar dataKey="mid" radius={[6, 6, 2, 2]}>
-            {data.map((d) => <Cell key={d.month} fill={d.mid >= peak * 0.88 ? '#8EEDF0' : 'rgb(142 237 240 / .42)'} />)}
+            {data.map((d) => <Cell key={d.month} fill={d.mid >= peak * 0.88 ? '#08628c' : 'rgb(8 98 140 / .35)'} />)}
           </Bar>
         </BarChart>
       </ResponsiveContainer>

@@ -102,7 +102,7 @@ export function MapPage() {
           </BaseMap>
         </div>
 
-        <aside className="relative z-[500] m-4 mt-[92px] flex max-h-[calc(100%-108px)] w-[min(360px,calc(100%-32px))] flex-col gap-5 self-start overflow-y-auto rounded-xl border border-white/14 bg-[rgb(5_44_60/.88)] p-[22px] backdrop-blur-[18px]">
+        <aside className="relative z-[500] m-4 mt-[92px] flex max-h-[calc(100%-108px)] w-[min(360px,calc(100%-32px))] flex-col gap-5 self-start overflow-y-auto waha-panel waha-panel-map rounded-xl p-[22px]">
           <div>
             <p className="m-0 mb-2 text-xs font-semibold uppercase tracking-[.14em] text-sand-200">Water map</p>
             <h1 className="m-0 text-[32px] leading-none tracking-heading">Where the water is</h1>
@@ -142,7 +142,7 @@ function Detail({ sel, analyses, zones, runoff, communities, reports }: DetailPr
       <span className="text-xs font-semibold" style={{ color }}>{kind}</span>
       <h2 className="m-0 font-display text-xl font-bold tracking-[-0.035em]">{title}</h2>
       {body}
-      <Link to={cta[1]} className="mt-1.5 self-start rounded-full bg-sand-400 px-[18px] py-2.5 text-[13px] font-semibold text-lagoon-950 hover:bg-sand-300 hover:text-lagoon-950">{cta[0]}</Link>
+      <Link to={cta[1]} className="mt-1.5 self-start rounded-full bg-sand-400 px-[18px] py-2.5 text-[13px] font-semibold text-[#04141c] hover:bg-sand-300 hover:text-[#04141c]">{cta[0]}</Link>
     </div>
   );
   const metric = (label: string, value: string, note?: string) => (

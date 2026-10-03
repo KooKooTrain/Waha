@@ -83,7 +83,7 @@ export function Rainfall() {
       <PageHeader wide overline="Rainwater recovery" title="Where would the rain go?">
         <div className="flex flex-col items-start gap-2.5">
           <span className="text-[13px] font-semibold">Rain scenario</span>
-          <div className="flex flex-wrap rounded-[18px] border border-white/18 bg-[rgb(4_40_56/.62)] p-1 backdrop-blur-[18px]">
+          <div className="flex flex-wrap waha-panel rounded-[18px] p-1">
             {RAIN_SCENARIOS.map((s) => (
               <button
                 key={s.key}
@@ -141,7 +141,7 @@ export function Rainfall() {
           </BaseMap>
 
           {/* draw panel */}
-          <div className="absolute right-3 top-3 z-[700] flex w-[min(300px,calc(100%-24px))] flex-col gap-3 rounded-lg border border-white/20 bg-[rgb(4_40_56/.72)] p-4 shadow-[inset_0_1px_0_rgb(255_255_255/.18)] backdrop-blur-[20px]">
+          <div className="absolute right-3 top-3 z-[700] flex w-[min(300px,calc(100%-24px))] flex-col gap-3 waha-panel waha-panel-map rounded-lg p-4">
             {!drawing ? (
               <>
                 <span className="text-sm font-semibold">Draw your own area</span>
@@ -169,7 +169,7 @@ export function Rainfall() {
                   ))}
                 </div>
                 <div className="flex gap-2">
-                  <button onClick={finish} disabled={pts.length < 3} className={cx('flex-1 rounded-full border-0 px-3.5 py-2 text-[13px] font-semibold text-lagoon-950', pts.length < 3 ? 'cursor-not-allowed bg-sand-400/40' : 'cursor-pointer bg-sand-400')}>
+                  <button onClick={finish} disabled={pts.length < 3} className={cx('flex-1 rounded-full border-0 px-3.5 py-2 text-[13px] font-semibold text-[#04141c]', pts.length < 3 ? 'cursor-not-allowed bg-sand-400/40' : 'cursor-pointer bg-sand-400')}>
                     Finish area
                   </button>
                   <button onClick={() => { setDrawing(false); setPts([]); }} className="cursor-pointer rounded-full border border-white/20 bg-transparent px-3.5 py-2 text-[13px] font-semibold text-mist-50">
@@ -181,7 +181,7 @@ export function Rainfall() {
           </div>
 
           {/* legend */}
-          <div className="absolute bottom-7 left-3 z-[700] flex flex-col gap-2.5 rounded-[18px] border border-white/20 bg-[rgb(4_40_56/.72)] px-4 py-3.5 backdrop-blur-[20px]">
+          <div className="absolute bottom-7 left-3 z-[700] flex flex-col gap-2.5 waha-panel waha-panel-map rounded-[18px] px-4 py-3.5">
             <span className="text-xs font-semibold">Capturable m³ · {scen.label}</span>
             <div className="flex gap-0.5">
               {BINS.map((c, i) => (
@@ -204,7 +204,7 @@ export function Rainfall() {
         </section>
 
         {/* SIDE */}
-        <aside className="flex max-h-[600px] min-w-0 flex-[1_1_340px] flex-col gap-1.5 overflow-y-auto rounded-xl border border-white/12 bg-[rgb(5_44_60/.86)] p-[22px] shadow-[inset_0_1px_0_rgb(255_255_255/.1)] backdrop-blur-[18px]">
+        <aside className="flex max-h-[600px] min-w-0 flex-[1_1_340px] flex-col gap-1.5 overflow-y-auto waha-panel rounded-xl p-[22px]">
           {!sel ? (
             <>
               <div className="flex items-baseline justify-between gap-3 pb-3">

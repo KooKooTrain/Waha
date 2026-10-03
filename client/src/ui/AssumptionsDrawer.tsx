@@ -42,13 +42,13 @@ export function AssumptionsDrawer({ open, onClose, keys, formula }: Props) {
   const edited = keys.filter((k) => overrides[k]);
 
   return (
-    <div className="fixed inset-0 z-[1000] flex justify-end">
+    <div className="fixed inset-0 z-[1200] flex justify-end">
       <div onClick={onClose} className="absolute inset-0 bg-[rgb(2_24_34/.55)] backdrop-blur-[2px]" />
       <aside
         role="dialog"
         aria-modal="true"
         aria-labelledby="assumptions-title"
-        className="relative flex h-full w-[min(460px,100%)] animate-drawer flex-col gap-[22px] overflow-y-auto border-l border-white/14 bg-[rgb(5_40_54/.96)] p-7 shadow-[-30px_0_80px_-30px_rgb(0_0_0/.6)] backdrop-blur-[24px]"
+        className="relative flex h-full w-[min(460px,100%)] animate-drawer flex-col gap-[22px] overflow-y-auto waha-panel border-l p-7 shadow-[-30px_0_80px_-30px_rgb(0_0_0/.6)]"
       >
         <div className="flex items-center justify-between">
           <h2 id="assumptions-title" className="m-0 text-[28px] tracking-tight">Assumptions</h2>
@@ -97,7 +97,7 @@ export function AssumptionsDrawer({ open, onClose, keys, formula }: Props) {
                         else e.currentTarget.value = String(trim(a.value));
                       }}
                       onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
-                      className="w-24 rounded-sm border border-white/16 bg-[rgb(4_30_42/.55)] px-2.5 py-1.5 text-right text-sm font-semibold tabular-nums text-aqua-300 outline-none focus:border-aqua-300"
+                      className="w-24 rounded-sm border border-white/16 bg-[#fff] px-2.5 py-1.5 text-right text-sm font-semibold tabular-nums text-aqua-300 outline-none focus:border-aqua-300"
                     />
                     <span className="w-16 text-xs text-mist-300">{a.unit}</span>
                   </span>

@@ -75,26 +75,26 @@ export function Community() {
 
       <main className="mx-auto flex max-w-[1280px] flex-wrap items-start gap-6 px-4 pb-24 sm:px-6">
         <section className="flex min-w-0 flex-[999_1_560px] flex-col gap-3">
-          <div className="rounded-xl border border-white/45 bg-mist-50/95 px-6 py-2 text-[#193c4b] shadow-[inset_0_1px_0_#fff,0_12px_30px_rgb(4_40_56/.18)] backdrop-blur-[18px]">
+          <div className="waha-panel rounded-xl px-6 py-2">
             {list.length === 0 && (
               <div className="flex flex-col items-center gap-2.5 px-4 py-16 text-center">
                 <span className="font-display text-2xl font-black tracking-tight">No reports match</span>
                 <span className="max-w-[36ch] text-sm leading-normal text-[#66777e]">Try another type or status, or be the first to report one here.</span>
-                <button onClick={() => { setKind('all'); setStatus('all'); }} className="mt-1.5 cursor-pointer rounded-full border border-[#dce6ea] bg-white px-4 py-[9px] text-[13px] font-semibold text-[#193c4b] hover:bg-[#f5f9fa]">Clear filters</button>
+                <button onClick={() => { setKind('all'); setStatus('all'); }} className="mt-1.5 cursor-pointer rounded-full border border-[#dce6ea] bg-[#fff] px-4 py-[9px] text-[13px] font-semibold text-[#193c4b] hover:bg-[#f5f9fa]">Clear filters</button>
               </div>
             )}
             {list.map((r) => {
-              const { Icon, label } = KIND_META[r.kind];
+              const { Icon, label, color, tint } = KIND_META[r.kind];
               const open = r.id === focus;
               return (
                 <article key={r.id} className="animate-fade-up border-b border-[#dce6ea] py-[18px] last:border-b-0">
                   <button onClick={() => setFocus(open ? null : r.id)} aria-expanded={open} className="flex w-full cursor-pointer gap-4 border-0 bg-transparent p-0 text-left text-[#193c4b]">
-                    <span className="grid size-[72px] flex-none place-items-center rounded-[14px] border border-[#dce6ea] bg-white sm:size-[88px]">
-                      <Icon size={24} strokeWidth={1.75} className="text-[#155771]" aria-hidden />
+                    <span className="grid size-[72px] flex-none place-items-center rounded-[14px] sm:size-[88px]" style={{ background: tint, color }}>
+                      <Icon size={24} strokeWidth={1.75} aria-hidden />
                     </span>
                     <span className="flex min-w-0 flex-1 flex-col gap-1.5">
                       <span className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
-                        <span className="text-xs font-semibold text-sand-600">{label}</span>
+                        <span className="text-xs font-semibold" style={{ color }}>{label}</span>
                         <span className="waha-badge"><span aria-hidden className="size-1.5 rounded-full" style={{ background: STATUS_HEX[r.status] }} />{STATUS_LABELS[r.status]}</span>
                       </span>
                       <span className="text-[15px] font-medium leading-snug">{r.title}</span>
@@ -103,7 +103,7 @@ export function Community() {
                     </span>
                   </button>
                   {open && (
-                    <div className="mt-4 flex animate-fade-up flex-col gap-3 rounded-xl bg-[#103f53] p-4 text-mist-50 sm:ml-[104px]">
+                    <div className="mt-4 flex animate-fade-up flex-col gap-3 rounded-xl border border-[#dce6ea] bg-[#f7fafb] p-4 sm:ml-[104px]">
                       <StatusTimeline report={r} />
                       <StatusActions report={r} />
                     </div>
@@ -134,12 +134,12 @@ export function Community() {
               <FitTo points={list.map((r) => [r.lat, r.lng])} fitKey={`${kind}-${status}-${list.length}`} maxZoom={12} />
               <FlyTo to={focused ? [focused.lat, focused.lng] : undefined} zoom={14} />
             </BaseMap>
-            <div className="pointer-events-none absolute left-3 top-3 z-[600] rounded-full border border-white/20 bg-[rgb(4_40_56/.62)] px-3 py-2 text-xs font-semibold backdrop-blur-[16px]">
+            <div className="pointer-events-none absolute left-3 top-3 z-[600] waha-panel waha-panel-map rounded-full px-3 py-2 text-xs font-semibold">
               {list.length} report{list.length === 1 ? '' : 's'} on map
             </div>
           </div>
 
-          <section className="flex flex-col gap-1 rounded-xl border border-white/12 bg-[rgb(5_44_60/.86)] p-[22px] backdrop-blur-[18px]">
+          <section className="waha-panel flex flex-col gap-1 rounded-xl p-[22px]">
             <h2 className="m-0 text-xl font-bold tracking-tight">Neighbourhood groups</h2>
             <p className="m-0 mb-2 text-[13px] leading-normal text-mist-200">
               Buildings and open reports close enough to share a tank, a tanker run or a pipe. Found by clustering, not drawn by hand.
@@ -209,10 +209,10 @@ function ReportForm({ onClose, onSeeOnMap }: { onClose: () => void; onSeeOnMap: 
   };
 
   return (
-    <div className="fixed inset-0 z-[1000] flex justify-end">
+    <div className="fixed inset-0 z-[1200] flex justify-end">
       <div onClick={onClose} className="absolute inset-0 bg-[rgb(2_24_34/.55)] backdrop-blur-[2px]" />
       <aside role="dialog" aria-modal="true" aria-labelledby="report-title"
-        className="relative flex h-full w-[min(520px,100%)] animate-drawer flex-col gap-[22px] overflow-y-auto border-l border-white/14 bg-[rgb(5_40_54/.97)] p-7 shadow-[-30px_0_80px_-30px_rgb(0_0_0/.6)]">
+        className="relative flex h-full w-[min(520px,100%)] animate-drawer flex-col gap-[22px] overflow-y-auto waha-panel border-l p-7 shadow-[-30px_0_80px_-30px_rgb(0_0_0/.6)]">
         <div className="flex items-center justify-between">
           <h2 id="report-title" className="m-0 text-[28px] tracking-tight">{done ? 'Report submitted' : 'Report an opportunity'}</h2>
           <button onClick={onClose} aria-label="Close" className="grid size-9 cursor-pointer place-items-center rounded-full border border-white/20 bg-white/6 text-mist-50 hover:bg-white/12">
@@ -259,12 +259,12 @@ function ReportForm({ onClose, onSeeOnMap }: { onClose: () => void; onSeeOnMap: 
               <textarea
                 value={description} onChange={(e) => setDescription(e.target.value)} maxLength={280} rows={4}
                 placeholder="e.g. Water stays in the car park for days after rain."
-                className="w-full resize-y rounded-[12px] border border-white/16 bg-[rgb(4_30_42/.55)] px-3.5 py-3 text-[15px] font-medium leading-normal text-mist-50 outline-none focus:border-aqua-300"
+                className="w-full resize-y rounded-[12px] border border-white/16 bg-[#fff] px-3.5 py-3 text-[15px] font-medium leading-normal text-mist-50 outline-none focus:border-aqua-300"
               />
             </label>
 
             <button onClick={submit} disabled={!valid || sending}
-              className={cx('rounded-full border-0 px-6 py-3.5 text-[15px] font-semibold text-lagoon-950', valid ? 'cursor-pointer bg-sand-400 hover:bg-sand-300' : 'cursor-not-allowed bg-sand-400/40')}>
+              className={cx('rounded-full border-0 px-6 py-3.5 text-[15px] font-semibold text-[#04141c]', valid ? 'cursor-pointer bg-sand-400 hover:bg-sand-300' : 'cursor-not-allowed bg-sand-400/40')}>
               {sending ? 'Submitting…' : 'Submit report'}
             </button>
             <span className="-mt-3 text-center text-xs text-mist-300">
@@ -287,7 +287,7 @@ function ReportForm({ onClose, onSeeOnMap }: { onClose: () => void; onSeeOnMap: 
               <StatusTimeline report={done} />
             </div>
             <div className="flex flex-wrap gap-2.5">
-              <button onClick={() => onSeeOnMap(done.id)} className="cursor-pointer rounded-full border-0 bg-sand-400 px-5 py-3 text-sm font-semibold text-lagoon-950">See it on the map</button>
+              <button onClick={() => onSeeOnMap(done.id)} className="cursor-pointer rounded-full border-0 bg-sand-400 px-5 py-3 text-sm font-semibold text-[#04141c]">See it on the map</button>
               <button onClick={reset} className="cursor-pointer rounded-full border border-white/25 bg-transparent px-5 py-3 text-sm font-semibold text-mist-50">Report another</button>
             </div>
           </div>

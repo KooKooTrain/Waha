@@ -234,8 +234,9 @@ export const STATUS_HEX: Record<ReportStatus, string> = {
   submitted: '#A9B8FF', review: '#E8C56B', investigating: '#C9A2FF', verified: '#6EE3A8', resolved: '#5CE1E6', rejected: '#F08A6B',
 };
 
-export const KIND_META: Record<ReportKind, { label: string; Icon: LucideIcon }> = {
-  condensate: { label: 'AC discharge', Icon: AirVent },
-  rainfall: { label: 'Rain pooling', Icon: CloudRain },
-  leak: { label: 'Leak', Icon: Droplet },
+/** Colours follow waha-extra's categories: condensate blue, rainfall teal, community olive. */
+export const KIND_META: Record<ReportKind, { label: string; Icon: LucideIcon; color: string; tint: string }> = {
+  condensate: { label: 'AC discharge', Icon: AirVent, color: '#08628c', tint: '#e8f1f5' },
+  rainfall: { label: 'Rain pooling', Icon: CloudRain, color: '#4793af', tint: '#e7f5f8' },
+  leak: { label: 'Leak', Icon: Droplet, color: '#858258', tint: '#f0f0e8' },
 };

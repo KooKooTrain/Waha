@@ -47,12 +47,12 @@ void main(){
   float hl=texture2D(hm,uv-vec2(hp.x,0.)).r,hr=texture2D(hm,uv+vec2(hp.x,0.)).r;
   float hd=texture2D(hm,uv-vec2(0.,hp.y)).r,hu=texture2D(hm,uv+vec2(0.,hp.y)).r;
   vec2 g=vec2(hr-hl,hu-hd)*hk;
-  disp+=g*.14;ring+=clamp((g.x-g.y)*3.,-1.,1.);
+  disp+=g*.09;ring+=clamp((g.x-g.y)*2.,-.7,.7);
  }
  p+=disp;
- float T=t*.07;
+ float T=t*.05;
  // Long swells plus two cross swells, so the whole surface keeps heaving like open sea.
- float sw=sin(dot(p,vec2(1.9,.8))*2.6-t*1.1)+.6*sin(dot(p,vec2(-.7,1.7))*3.4-t*1.5)+.35*sin(dot(p,vec2(1.2,-1.3))*5.1-t*2.1);
+ float sw=sin(dot(p,vec2(1.9,.8))*2.6-t*.75)+.6*sin(dot(p,vec2(-.7,1.7))*3.4-t*1.)+.35*sin(dot(p,vec2(1.2,-1.3))*5.1-t*1.4);
  p+=vec2(.8,.35)*sw*.035;
  p+=vec2(T*1.1,-T*.55);
  vec2 q=vec2(fbm(p+vec2(0.,T)),fbm(p+vec2(5.2,1.3)-T));
@@ -63,7 +63,7 @@ void main(){
  c=mix(c,shal,smoothstep(.5,.9,f+length(w)*.15)*.75);
  float sb=smoothstep(.54,.76,fbm(p*.45+w*.35+vec2(3.1,7.7)))*sa;
  c=mix(c,mix(shal,sand,.7),sb*.85);
- float cs=caus(p+w*.6,t*.25);
+ float cs=caus(p+w*.6,t*.18);
  c+=foam*pow(cs,1.8)*.6*(.5+.5*smoothstep(.3,.8,f));
  c+=foam*ring*.22+foam*abs(ring)*.12;
  c+=foam*smoothstep(.9,1.8,sw)*.07;c-=.03*smoothstep(-.4,-1.6,sw);
@@ -152,8 +152,8 @@ void main(){
         lx = x; ly = y; lt = real;
         rip.set([x, y, real, strength], ri * 4); ri = (ri + 1) % N;
       };
-      this._mv = e => addRipple(e, 0.3, false);
-      this._dn = e => addRipple(e, 0.8, true);
+      this._mv = e => addRipple(e, 0.18, false);
+      this._dn = e => addRipple(e, 0.55, true);
       addEventListener('pointermove', this._mv, { passive: true });
       addEventListener('pointerdown', this._dn, { passive: true });
 
@@ -180,8 +180,8 @@ void main(){
           const len = Math.hypot(p1[0] - p0[0], p1[1] - p0[1]);
           // A big jump means the pointer left and came back elsewhere. Don't streak across the screen.
           if (len > sim.h * 0.3) p0 = p1;
-          else str = Math.min(len * 0.02, 0.22);
-          if (splash) { str += splash * 0.4; rad *= 1.6; splash = 0; }
+          else str = Math.min(len * 0.014, 0.15);
+          if (splash) { str += splash * 0.3; rad *= 1.6; splash = 0; }
           prev = cur;
         }
         while (acc >= 1 / 120) { acc -= 1 / 120; step(p0, p1, str, rad); str = 0; }

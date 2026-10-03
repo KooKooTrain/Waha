@@ -63,13 +63,13 @@ export function StatusActions({ report }: { report: Report }) {
             maxLength={280}
             aria-label="Note for the reporter"
             placeholder={needsNote ? 'Why is it being rejected? (needed)' : 'Note for the reporter (optional)'}
-            className="w-full rounded-sm border border-white/16 bg-[rgb(4_30_42/.55)] px-3 py-2 text-sm text-mist-50 outline-none focus:border-aqua-300"
+            className="w-full rounded-sm border border-white/16 bg-[#fff] px-3 py-2 text-sm text-mist-50 outline-none focus:border-aqua-300"
           />
           <button
             onClick={save}
             disabled={!ready || busy}
             className={cx(
-              'self-start rounded-full border-0 px-4 py-2 text-[13px] font-semibold text-lagoon-950',
+              'self-start rounded-full border-0 px-4 py-2 text-[13px] font-semibold text-[#04141c]',
               ready ? 'cursor-pointer bg-sand-400 hover:bg-sand-300' : 'cursor-not-allowed bg-sand-400/40',
             )}
           >

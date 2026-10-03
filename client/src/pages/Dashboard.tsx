@@ -12,7 +12,7 @@ import { AssumptionsDrawer } from '../ui/AssumptionsDrawer';
 import { PageHeader, SourceNote } from '../ui/Layout';
 import { ConfidenceMeter, EstimateBadge, STATUS_HEX, StatusChip, fmt, fmtDate } from '../ui/kit';
 
-const card = 'rounded-xl border border-white/12 bg-[rgb(5_44_60/.86)] p-6 backdrop-blur-[18px]';
+const card = 'waha-panel rounded-xl p-6';
 
 export function Dashboard() {
   const a = useAssumptions();
@@ -62,23 +62,23 @@ export function Dashboard() {
             <div className="flex flex-wrap items-baseline justify-between gap-3">
               <h2 className="m-0 text-xl font-bold tracking-[-0.035em]">Recoverable water by month</h2>
               <div className="flex gap-3.5 text-xs font-medium text-mist-200">
-                <span className="flex items-center gap-1.5"><span className="size-2.5 rounded-[3px] bg-aqua-300" />Condensate</span>
-                <span className="flex items-center gap-1.5"><span className="size-2.5 rounded-[3px] bg-status-submitted" />Rainfall</span>
+                <span className="flex items-center gap-1.5"><span className="size-2.5 rounded-[3px] bg-[#08628c]" />Condensate</span>
+                <span className="flex items-center gap-1.5"><span className="size-2.5 rounded-[3px] bg-[#49a3c0]" />Rainfall</span>
               </div>
             </div>
             <div className="h-[220px]" role="img" aria-label="Monthly recoverable water: condensate peaks in summer, rain in winter">
               {totals && (
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={totals.monthly.map((m) => ({ month: m.month, condensate: m.condensateL / 1000, rain: m.rainL / 1000 }))} margin={{ top: 4, right: 0, left: 0, bottom: 0 }}>
-                    <XAxis dataKey="month" tickLine={false} axisLine={{ stroke: 'rgb(255 255 255 / .14)' }} tick={{ fill: '#A8C3C9', fontSize: 11 }} interval={0} />
+                    <XAxis dataKey="month" tickLine={false} axisLine={{ stroke: 'rgb(25 60 75 / .14)' }} tick={{ fill: '#66777e', fontSize: 11 }} interval={0} />
                     <ChartTip
-                      cursor={{ fill: 'rgb(255 255 255 / .05)' }}
+                      cursor={{ fill: 'rgb(25 60 75 / .06)' }}
                       formatter={(v, name) => [`${fmt(Number(v))} m³`, name === 'condensate' ? 'Condensate' : 'Rainfall']}
-                      contentStyle={{ background: 'rgb(4 40 56 / .95)', border: '1px solid rgb(255 255 255 / .2)', borderRadius: 10, color: '#EEF5F6', fontSize: 12 }}
-                      labelStyle={{ color: '#A8C3C9' }}
+                      contentStyle={{ background: '#fff', border: '1px solid #dce6ea', borderRadius: 10, color: '#193c4b', fontSize: 12 }}
+                      labelStyle={{ color: '#66777e' }}
                     />
-                    <Bar dataKey="condensate" stackId="w" fill="#8EEDF0" />
-                    <Bar dataKey="rain" stackId="w" fill="#A9B8FF" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="condensate" stackId="w" fill="#08628c" />
+                    <Bar dataKey="rain" stackId="w" fill="#49a3c0" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               )}
@@ -179,10 +179,10 @@ const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
 
 function Kpi({ label, value, note, good }: { label: string; value: string; note: string; good?: boolean }) {
   return (
-    <div className="flex flex-col gap-2 rounded-lg border border-white/12 bg-[rgb(5_44_60/.86)] p-[22px] backdrop-blur-[18px]">
+    <div className="flex flex-col gap-2 waha-panel rounded-lg p-[22px]">
       <span className="text-[13px] font-medium text-mist-300">{label}</span>
       <span className="font-display text-[34px] font-bold tabular-nums leading-none tracking-[-0.05em]">{value}</span>
-      <span className={good ? 'text-xs font-medium text-conf-high' : 'text-xs font-medium text-mist-300'}>{note}</span>
+      <span className={good ? 'text-xs font-medium text-conf-high-text' : 'text-xs font-medium text-mist-300'}>{note}</span>
     </div>
   );
 }
