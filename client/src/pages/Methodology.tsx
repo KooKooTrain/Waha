@@ -46,11 +46,11 @@ export function Methodology() {
             temperature and humidity normals, turn them into a humidity ratio (kg of water per kg of dry air) and subtract what is left after the coil.
             Fresh-air flow comes from ASHRAE 62.1 rates for each kind of building.
           </P>
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[560px] border-collapse text-sm tabular-nums">
+          <div className="waha-table">
+            <table className="tabular-nums">
               <thead>
-                <tr className="text-left text-xs font-semibold uppercase tracking-[.08em] text-mist-300">
-                  {['Month', 'Mean °C', 'Humidity %', 'Dew point °C', 'Outdoor g/kg', 'After coil g/kg', 'Water per kg air'].map((h) => <th key={h} className="border-b border-white/14 py-2 pr-3 font-semibold">{h}</th>)}
+                <tr>
+                  {['Month', 'Mean °C', 'Humidity %', 'Dew point °C', 'Outdoor g/kg', 'After coil g/kg', 'Water per kg air'].map((h) => <th key={h}>{h}</th>)}
                 </tr>
               </thead>
               <tbody>
@@ -58,14 +58,14 @@ export function Methodology() {
                   const wOut = humidityRatio(m.tMean, m.rh, p);
                   const drop = Math.max(0, wOut - wCoil);
                   return (
-                    <tr key={m.month} className={cx(drop === 0 && 'text-mist-400')}>
-                      <td className="border-b border-white/8 py-2 pr-3 font-semibold">{m.month}</td>
-                      <td className="border-b border-white/8 py-2 pr-3">{m.tMean}</td>
-                      <td className="border-b border-white/8 py-2 pr-3">{m.rh}</td>
-                      <td className="border-b border-white/8 py-2 pr-3">{dewPointC(m.tMean, m.rh).toFixed(1)}</td>
-                      <td className="border-b border-white/8 py-2 pr-3">{(wOut * 1000).toFixed(1)}</td>
-                      <td className="border-b border-white/8 py-2 pr-3">{(wCoil * 1000).toFixed(1)}</td>
-                      <td className="border-b border-white/8 py-2 pr-3 font-semibold text-aqua-300">{(drop * 1000).toFixed(1)} g</td>
+                    <tr key={m.month} className={cx(drop === 0 && 'text-[#9aabb2]')}>
+                      <td className="font-semibold">{m.month}</td>
+                      <td>{m.tMean}</td>
+                      <td>{m.rh}</td>
+                      <td>{dewPointC(m.tMean, m.rh).toFixed(1)}</td>
+                      <td>{(wOut * 1000).toFixed(1)}</td>
+                      <td>{(wCoil * 1000).toFixed(1)}</td>
+                      <td className="font-semibold text-[#155771]">{(drop * 1000).toFixed(1)} g</td>
                     </tr>
                   );
                 })}

@@ -9,7 +9,7 @@ import { useReports } from '../store/reports';
 import { BaseMap, FitTo } from '../ui/BaseMap';
 import { Nav, SourceNote } from '../ui/Layout';
 import { StatusActions } from '../ui/StatusActions';
-import { ConfidenceMeter, EstimateBadge, KIND_META, StatusChip, cx, fmt, fmtDate } from '../ui/kit';
+import { ConfidenceMeter, KIND_META, StatusChip, cx, fmt, fmtDate } from '../ui/kit';
 
 type Layer = 'reports' | 'buildings' | 'rainfall' | 'communities';
 const LAYERS: Record<Layer, { label: string; color: string }> = {
@@ -161,7 +161,7 @@ function Detail({ sel, analyses, zones, runoff, communities, reports }: DetailPr
     return shell(KIND_META[r.kind].label, LAYERS.reports.color, r.title, (
       <>
         <p className="m-0 text-sm leading-normal text-mist-200">{r.description}</p>
-        <div className="flex flex-wrap items-center gap-2"><StatusChip status={r.status} />{r.sample && <EstimateBadge kind="sample" />}</div>
+        <div className="flex flex-wrap items-center gap-2"><StatusChip status={r.status} /></div>
         <span className="text-xs text-mist-300">{placeOf(r)} · {fmtDate(r.createdAt)}</span>
         <StatusActions report={r} />
       </>

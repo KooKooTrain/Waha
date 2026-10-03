@@ -73,6 +73,17 @@
   a { @apply text-aqua-300 hover:text-mist-50; }
 }
 
+/* Light data table and badge, same look as waha-extra. In the components layer so utilities can still override. */
+@layer components {
+  .waha-table { overflow: auto; border: 1px solid #dce6ea; border-radius: 9px; background: #fff; color: #193c4b; }
+  .waha-table table { width: 100%; border-collapse: collapse; text-align: left; white-space: nowrap; }
+  .waha-table th { font-size: 11px; font-weight: 500; color: #6a7e88; background: #f5f9fa; padding: 13px 15px; }
+  .waha-table td { padding: 18px 15px; font-size: 13px; border-bottom: 1px solid #dce6ea; }
+  .waha-table td small { display: block; color: #6a7e88; font-size: 10px; margin-top: 5px; }
+  .waha-table tbody tr:last-child td { border: 0; }
+  .waha-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 550; padding: 5px 9px; border-radius: 20px; background: #eef2f4; color: #557481; white-space: nowrap; }
+}
+
 /* Liquid button. On hover the pill melts into a blob, keeps wobbling while you stay,
    and settles back when you leave. Unlayered on purpose so it beats Tailwind's rounded/transition. */
 .btn-liquid {
