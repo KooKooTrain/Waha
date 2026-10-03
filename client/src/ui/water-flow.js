@@ -47,7 +47,7 @@ void main(){
   float hl=texture2D(hm,uv-vec2(hp.x,0.)).r,hr=texture2D(hm,uv+vec2(hp.x,0.)).r;
   float hd=texture2D(hm,uv-vec2(0.,hp.y)).r,hu=texture2D(hm,uv+vec2(0.,hp.y)).r;
   vec2 g=vec2(hr-hl,hu-hd)*hk;
-  disp+=g*.22;ring+=clamp((g.x-g.y)*5.,-1.5,1.5);
+  disp+=g*.14;ring+=clamp((g.x-g.y)*3.,-1.,1.);
  }
  p+=disp;
  float T=t*.07;
@@ -152,8 +152,8 @@ void main(){
         lx = x; ly = y; lt = real;
         rip.set([x, y, real, strength], ri * 4); ri = (ri + 1) % N;
       };
-      this._mv = e => addRipple(e, 0.55, false);
-      this._dn = e => addRipple(e, 1.3, true);
+      this._mv = e => addRipple(e, 0.3, false);
+      this._dn = e => addRipple(e, 0.8, true);
       addEventListener('pointermove', this._mv, { passive: true });
       addEventListener('pointerdown', this._dn, { passive: true });
 
@@ -180,8 +180,8 @@ void main(){
           const len = Math.hypot(p1[0] - p0[0], p1[1] - p0[1]);
           // A big jump means the pointer left and came back elsewhere. Don't streak across the screen.
           if (len > sim.h * 0.3) p0 = p1;
-          else str = Math.min(len * 0.03, 0.35);
-          if (splash) { str += splash * 0.6; rad *= 1.6; splash = 0; }
+          else str = Math.min(len * 0.02, 0.22);
+          if (splash) { str += splash * 0.4; rad *= 1.6; splash = 0; }
           prev = cur;
         }
         while (acc >= 1 / 120) { acc -= 1 / 120; step(p0, p1, str, rad); str = 0; }

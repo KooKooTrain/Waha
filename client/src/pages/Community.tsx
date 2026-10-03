@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { CircleMarker, Polygon, Tooltip } from 'react-leaflet';
 import { X } from 'lucide-react';
 import {
@@ -75,52 +75,42 @@ export function Community() {
 
       <main className="mx-auto flex max-w-[1280px] flex-wrap items-start gap-6 px-4 pb-24 sm:px-6">
         <section className="flex min-w-0 flex-[999_1_560px] flex-col gap-3">
-          <div className="waha-table">
-            <table>
-              <thead>
-                <tr><th>Report</th><th>Type</th><th>Status</th></tr>
-              </thead>
-              <tbody>
-                {list.length === 0 && (
-                  <tr>
-                    <td colSpan={3} className="whitespace-normal py-12 text-center">
-                      <span className="block font-display text-xl font-bold">No reports match</span>
-                      <small>Try another type or status, or be the first to report one here.</small>
-                      <button onClick={() => { setKind('all'); setStatus('all'); }} className="mt-3 cursor-pointer rounded-full border border-[#dce6ea] bg-white px-4 py-2 text-[13px] font-medium text-[#193c4b] hover:bg-[#f5f9fa]">Clear filters</button>
-                    </td>
-                  </tr>
-                )}
-                {list.map((r) => {
-                  const { Icon, label } = KIND_META[r.kind];
-                  const open = r.id === focus;
-                  return (
-                    <Fragment key={r.id}>
-                      <tr onClick={() => setFocus(open ? null : r.id)} className={cx('cursor-pointer transition-colors hover:bg-[#f8fbfc]', open && 'bg-[#f5f9fa]')}>
-                        <td className="w-full min-w-[200px] whitespace-normal">
-                          <button aria-expanded={open} className="cursor-pointer border-0 bg-transparent p-0 text-left text-[13px] font-medium leading-snug text-[#193c4b]">{r.title}</button>
-                          <small>{placeOf(r)} · {fmtDate(r.createdAt)}</small>
-                        </td>
-                        <td><span className="inline-flex items-center gap-2"><Icon size={14} strokeWidth={1.75} className="text-[#155771]" aria-hidden />{label}</span></td>
-                        <td>
-                          <span className="waha-badge"><span aria-hidden className="size-1.5 rounded-full" style={{ background: STATUS_HEX[r.status] }} />{STATUS_LABELS[r.status]}</span>
-                        </td>
-                      </tr>
-                      {open && (
-                        <tr>
-                          <td colSpan={3} className="whitespace-normal bg-[#103f53] text-mist-50">
-                            <div className="flex animate-fade-up flex-col gap-3">
-                              {r.description !== r.title && <p className="m-0 text-sm leading-snug text-mist-200">{r.description}</p>}
-                              <StatusTimeline report={r} />
-                              <StatusActions report={r} />
-                            </div>
-                          </td>
-                        </tr>
-                      )}
-                    </Fragment>
-                  );
-                })}
-              </tbody>
-            </table>
+          <div className="rounded-xl border border-white/45 bg-mist-50/95 px-6 py-2 text-[#193c4b] shadow-[inset_0_1px_0_#fff,0_12px_30px_rgb(4_40_56/.18)] backdrop-blur-[18px]">
+            {list.length === 0 && (
+              <div className="flex flex-col items-center gap-2.5 px-4 py-16 text-center">
+                <span className="font-display text-2xl font-black tracking-tight">No reports match</span>
+                <span className="max-w-[36ch] text-sm leading-normal text-[#66777e]">Try another type or status, or be the first to report one here.</span>
+                <button onClick={() => { setKind('all'); setStatus('all'); }} className="mt-1.5 cursor-pointer rounded-full border border-[#dce6ea] bg-white px-4 py-[9px] text-[13px] font-semibold text-[#193c4b] hover:bg-[#f5f9fa]">Clear filters</button>
+              </div>
+            )}
+            {list.map((r) => {
+              const { Icon, label } = KIND_META[r.kind];
+              const open = r.id === focus;
+              return (
+                <article key={r.id} className="animate-fade-up border-b border-[#dce6ea] py-[18px] last:border-b-0">
+                  <button onClick={() => setFocus(open ? null : r.id)} aria-expanded={open} className="flex w-full cursor-pointer gap-4 border-0 bg-transparent p-0 text-left text-[#193c4b]">
+                    <span className="grid size-[72px] flex-none place-items-center rounded-[14px] border border-[#dce6ea] bg-white sm:size-[88px]">
+                      <Icon size={24} strokeWidth={1.75} className="text-[#155771]" aria-hidden />
+                    </span>
+                    <span className="flex min-w-0 flex-1 flex-col gap-1.5">
+                      <span className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
+                        <span className="text-xs font-semibold text-sand-600">{label}</span>
+                        <span className="waha-badge"><span aria-hidden className="size-1.5 rounded-full" style={{ background: STATUS_HEX[r.status] }} />{STATUS_LABELS[r.status]}</span>
+                      </span>
+                      <span className="text-[15px] font-medium leading-snug">{r.title}</span>
+                      {r.description !== r.title && <span className="text-sm leading-snug text-[#4d6370]">{r.description}</span>}
+                      <span className="text-[13px] text-[#66777e]">{placeOf(r)} · {fmtDate(r.createdAt)}</span>
+                    </span>
+                  </button>
+                  {open && (
+                    <div className="mt-4 flex animate-fade-up flex-col gap-3 rounded-xl bg-[#103f53] p-4 text-mist-50 sm:ml-[104px]">
+                      <StatusTimeline report={r} />
+                      <StatusActions report={r} />
+                    </div>
+                  )}
+                </article>
+              );
+            })}
           </div>
           <SourceNote source={source} />
         </section>
