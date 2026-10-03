@@ -4,14 +4,14 @@ import type { LatLngBoundsExpression, LatLngExpression, LeafletMouseEvent } from
 import { AREA_BOUNDS } from '@waha/shared';
 import { cx } from './kit';
 
-const TILES = 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}';
+const TILES = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}';
 const ATTRIBUTION = 'Tiles &copy; Esri &middot; Outlines &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
 /** The whole of the patch Waha covers: Abu Dhabi City, Mussafah and MBZ. */
 export const AREA: LatLngBoundsExpression = [[AREA_BOUNDS.south, AREA_BOUNDS.west], [AREA_BOUNDS.north, AREA_BOUNDS.east]];
 export const START: LatLngExpression = [24.42, 54.46];
 
-/** Dark Esri tiles tinted to the lagoon palette, like the design. */
+/** Esri street tiles, washed toward white in index.css so it reads like a normal street map. */
 export function BaseMap({ children, className, zoom = 11, onClick, crosshair }: {
   children?: ReactNode; className?: string; zoom?: number; onClick?: (e: LeafletMouseEvent) => void; crosshair?: boolean;
 }) {
@@ -25,7 +25,7 @@ export function BaseMap({ children, className, zoom = 11, onClick, crosshair }: 
       zoomControl={false}
       className={cx('waha-map size-full bg-lagoon-800', crosshair && 'cursor-crosshair', className)}
     >
-      <TileLayer url={TILES} attribution={ATTRIBUTION} maxZoom={18} maxNativeZoom={16} />
+      <TileLayer url={TILES} attribution={ATTRIBUTION} maxZoom={19} maxNativeZoom={18} />
       <ZoomControl position="bottomright" />
       {onClick && <ClickHandler onClick={onClick} />}
       {children}

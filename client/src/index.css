@@ -95,7 +95,7 @@
 }
 
 /* Leaflet, dressed to match */
-.waha-map .leaflet-tile-pane { filter: sepia(1) hue-rotate(150deg) saturate(1.8) brightness(1.5) contrast(.95); }
+.waha-map .leaflet-tile-pane { filter: saturate(.4) brightness(1.13) contrast(.94); }
 .waha-map .leaflet-control-attribution { background: rgb(4 40 56 / .6); color: var(--color-mist-200); font-size: 10px; }
 .waha-map .leaflet-control-attribution a { color: var(--color-aqua-300); }
 .waha-map .leaflet-control-zoom a { background: rgb(4 40 56 / .8); color: var(--color-mist-50); border-color: rgb(255 255 255 / .15); }
