@@ -1,0 +1,100 @@
+import { BuildingOpportunity } from '../types';
+
+export const mockBuildings: BuildingOpportunity[] = [
+  {
+    id: 'B-042',
+    name: 'Building 042 (Al Maryah Financial Tower)',
+    latitude: 24.5025,
+    longitude: 54.3888,
+    buildingType: 'Commercial',
+    acUnits: 120,
+    averageOperatingHours: 10,
+    existingCondensateDrainage: true,
+    landscaping: true,
+    estimatedCondensateLitresPerDay: 1840,
+    estimatedAnnualLitres: 671600,
+    potentialUses: ['Landscape irrigation', 'Non-potable facility applications'],
+    recoveryPotential: 'High',
+    confidence: 'Medium',
+    assumptions: [
+      'Estimated using AC quantity (120 units) and 10 operating hours/day',
+      'Assumed ~1.53 L/hr condensate per unit in summer UAE climate'
+    ],
+    createdAt: new Date('2026-09-15T08:00:00Z').toISOString()
+  },
+  {
+    id: 'B-108',
+    name: 'Corniche Plaza Complex',
+    latitude: 24.4750,
+    longitude: 54.3480,
+    buildingType: 'Mixed-Use',
+    acUnits: 250,
+    averageOperatingHours: 14,
+    existingCondensateDrainage: false,
+    landscaping: true,
+    estimatedCondensateLitresPerDay: 5366,
+    estimatedAnnualLitres: 1958590,
+    potentialUses: ['Public park irrigation', 'Cooling tower makeup water'],
+    recoveryPotential: 'High',
+    confidence: 'High',
+    assumptions: [
+      'High-occupancy mixed commercial and retail usage pattern',
+      'Direct diversion to nearby Corniche greenery recommended'
+    ],
+    createdAt: new Date('2026-09-18T10:30:00Z').toISOString()
+  },
+  {
+    id: 'B-215',
+    name: 'Yas Gateway Commercial Hub',
+    latitude: 24.4880,
+    longitude: 54.6080,
+    buildingType: 'Commercial',
+    acUnits: 180,
+    averageOperatingHours: 12,
+    existingCondensateDrainage: true,
+    landscaping: true,
+    estimatedCondensateLitresPerDay: 3312,
+    estimatedAnnualLitres: 1208880,
+    potentialUses: ['On-site landscaping', 'Vehicle washing'],
+    recoveryPotential: 'High',
+    confidence: 'Medium',
+    assumptions: ['High central chiller capacity operating continuously during daytime peaks'],
+    createdAt: new Date('2026-09-20T14:15:00Z').toISOString()
+  },
+  {
+    id: 'B-309',
+    name: 'Reem Heights Tower B',
+    latitude: 24.4960,
+    longitude: 54.4050,
+    buildingType: 'Residential',
+    acUnits: 90,
+    averageOperatingHours: 8,
+    existingCondensateDrainage: false,
+    landscaping: false,
+    estimatedCondensateLitresPerDay: 1104,
+    estimatedAnnualLitres: 402960,
+    potentialUses: ['Toilet flushing recirculating loop', 'Basement cleaning'],
+    recoveryPotential: 'Medium',
+    confidence: 'Medium',
+    assumptions: ['Intermittent residential usage throughout the day'],
+    createdAt: new Date('2026-09-22T11:00:00Z').toISOString()
+  },
+  {
+    id: 'B-412',
+    name: 'Mussafah Logistics Center',
+    latitude: 24.3600,
+    longitude: 54.5100,
+    buildingType: 'Government / Industrial',
+    acUnits: 300,
+    averageOperatingHours: 16,
+    existingCondensateDrainage: true,
+    landscaping: true,
+    estimatedCondensateLitresPerDay: 7360,
+    estimatedAnnualLitres: 2686400,
+    potentialUses: ['Dust suppression', 'Industrial washing & landscape buffer'],
+    recoveryPotential: 'High',
+    confidence: 'High',
+    assumptions: ['Heavy duty industrial chiller operation with high ambient condensation rate'],
+    createdAt: new Date('2026-09-25T09:45:00Z').toISOString()
+  }
+];
