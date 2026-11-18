@@ -2,9 +2,17 @@
 
 **WAHA** is a UAE-focused water resource intelligence platform. Its core mission is identifying overlooked water resources (such as AC condensate and storm runoff), quantifying the opportunity, and connecting those opportunities to people who can investigate or act on them.
 
+<p align="center">
+  <a href="https://wahadu.netlify.app/">Live site</a>
+</p>
+
+<p align="center">
+  <img src="assets/waha.jpeg" alt="Waha" width="85%" />
+</p>
+
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Installation
 ```bash
@@ -26,7 +34,7 @@ npm start
 
 ---
 
-## 📡 Core API Endpoints
+## Core API Endpoints
 
 | Method | Endpoint | Description |
 |---|---|---|
@@ -42,7 +50,7 @@ npm start
 
 ---
 
-## 💡 Example Payloads
+## Example Payloads
 
 ### 1. Buildings - Analyze Condensate Potential
 `POST /api/buildings/analyze`
@@ -154,7 +162,7 @@ Returns aggregated totals, type breakdowns (`buildings`, `rainfall`, `community`
 
 ---
 
-## 🎨 Frontend Integration Notes
+## Frontend Integration Notes
 
 - **CORS**: Pre-configured to accept requests from `http://localhost:5173` (Vite) and `http://localhost:3000`.
 - **Data Persistence**: In-memory array storage for hackathon prototype simplicity. Resets on server restart.
